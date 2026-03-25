@@ -9,7 +9,7 @@ export class TaskManager {
         this.restockTasks = [];
         
         this.spawnTimer = 0;
-        this.spawnInterval = 5;
+        this.spawnInterval = 3;
         
         this.spillMaterial = new THREE.MeshStandardMaterial({
             color: 0x00aaff,
@@ -67,9 +67,9 @@ export class TaskManager {
     spawnRandomTask() {
         const taskType = Math.random();
         
-        if (taskType < 0.4) {
+        if (taskType < 0.33) {
             this.spawnSpill();
-        } else if (taskType < 0.7) {
+        } else if (taskType < 0.66) {
             this.spawnGlass();
         } else {
             this.spawnRestockTask();
@@ -132,11 +132,12 @@ export class TaskManager {
             return;
         }
         
-        shelf.stockLevel = Math.max(0, shelf.stockLevel - 30);
+        const reduction = 35 + Math.floor(Math.random() * 20);
+        shelf.stockLevel = Math.max(0, shelf.stockLevel - reduction);
         
         this.updateShelfProductVisibility(shelf);
         
-        if (shelf.stockLevel <= 0) {
+        if (shelf.stockLevel <= 10) {
             shelf.stocked = false;
             
             this.restockTasks.push({
