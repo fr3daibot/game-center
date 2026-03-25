@@ -315,8 +315,8 @@ export class Store {
         for (const shelf of this.shelves) {
             const sx = shelf.position.x;
             const sz = shelf.position.z;
-            const shelfHalfX = 1.0;
-            const shelfHalfZ = 0.4;
+            const shelfHalfX = 1.5;
+            const shelfHalfZ = 0.5;
             
             if (Math.abs(px - sx) < shelfHalfX + radius && Math.abs(pz - sz) < shelfHalfZ + radius) {
                 return true;

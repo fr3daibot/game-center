@@ -60,14 +60,15 @@ export class Player {
             const speed = (input.sprinting ? this.sprintSpeed : this.moveSpeed) * delta;
             const newX = this.position.x + moveDir.x * speed;
             const newZ = this.position.z + moveDir.z * speed;
+            const playerRadius = 0.5;
             
-            if (!this.store.checkCollision({ x: newX, z: newZ }, 0.3)) {
+            if (!this.store.checkCollision({ x: newX, z: newZ }, playerRadius)) {
                 this.position.x = newX;
                 this.position.z = newZ;
             } else {
-                if (!this.store.checkCollision({ x: newX, z: this.position.z }, 0.3)) {
+                if (!this.store.checkCollision({ x: newX, z: this.position.z }, playerRadius)) {
                     this.position.x = newX;
-                } else if (!this.store.checkCollision({ x: this.position.x, z: newZ }, 0.3)) {
+                } else if (!this.store.checkCollision({ x: this.position.x, z: newZ }, playerRadius)) {
                     this.position.z = newZ;
                 }
             }

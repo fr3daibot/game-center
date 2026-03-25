@@ -29,6 +29,15 @@ export class Minimap {
         this.ctx.clearRect(0, 0, this.width, this.height);
         
         this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
+        this.ctx.clip();
+        
+        this.ctx.fillStyle = 'rgba(10, 10, 30, 0.75)';
+        this.ctx.fillRect(0, 0, this.width, this.height);
+        
+        this.ctx.restore();
+        this.ctx.save();
         
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
