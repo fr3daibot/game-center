@@ -10,8 +10,6 @@ export class UI {
         this.tasksValue = document.getElementById('tasksValue');
         this.comboElement = document.getElementById('combo');
         this.comboValue = document.getElementById('comboValue');
-        this.weaponIcon = document.getElementById('weaponIcon');
-        this.weaponName = document.getElementById('weaponName');
         this.notification = document.getElementById('notification');
         this.notificationText = document.getElementById('notificationText');
         this.damageOverlay = document.getElementById('damageOverlay');
@@ -80,10 +78,6 @@ export class UI {
     }
     
     updateWeaponUI(name, icon, target, weaponIndex) {
-        this.weaponIcon.textContent = icon;
-        this.weaponName.textContent = name;
-        this.weaponName.title = `Target: ${target}`;
-        
         document.querySelectorAll('.weapon-slot').forEach((slot, i) => {
             slot.classList.toggle('active', i === weaponIndex);
         });
