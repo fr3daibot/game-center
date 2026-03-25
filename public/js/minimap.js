@@ -83,26 +83,19 @@ export class Minimap {
         const zones = this.store.zones;
         
         zones.forEach(zone => {
+            if (zone.type !== 'hot') return;
+            
             const pos = this.worldToMinimapLocal(zone.x, zone.z, playerPos.x, playerPos.z);
             const radius = zone.radius * this.scale;
             
-            let alpha = 0.2;
-            
-            if (zone.type === 'hot') {
-                alpha = Math.sin(this.pulseTime) * 0.1 + 0.2;
-                this.ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
-            } else if (zone.type === 'safe') {
-                this.ctx.fillStyle = 'rgba(0, 100, 255, 0.2)';
-            } else {
-                this.ctx.fillStyle = 'rgba(0, 255, 0, 0.15)';
-            }
+            const alpha = Math.sin(this.pulseTime) * 0.1 + 0.2;
+            this.ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
             
             this.ctx.beginPath();
             this.ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
             this.ctx.fill();
             
-            this.ctx.strokeStyle = zone.type === 'hot' ? 
-                `rgba(255, 0, 0, ${alpha + 0.3})` : 'rgba(0, 255, 0, 0.3)';
+            this.ctx.strokeStyle = `rgba(255, 0, 0, ${alpha + 0.3})`;
             this.ctx.lineWidth = 1;
             this.ctx.stroke();
         });
@@ -117,18 +110,43 @@ export class Minimap {
             const width = 3.2 * this.scale;
             const depth = 1.2 * this.scale;
             
-            this.ctx.fillStyle = shelf.stocked ? '#666' : '#333';
-            this.ctx.fillRect(pos.x - width/2, pos.y - depth/2, width, depth);
-            
-            this.ctx.strokeStyle = '#888';
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeRect(pos.x - width/2, pos.y - depth/2, width, depth);
-            
             if (!shelf.stocked) {
-                this.ctx.fillStyle = '#ff6b6b';
+                this.ctx.fillStyle = '#333';
+                this.ctx.fillRect(pos.x - width/2, pos.y - depth/2, width, depth);
+                
+                this.ctx.strokeStyle = '#ff6b6b';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(pos.x - width/2, pos.y - depth/2, width, depth);
+                
+                this.ctx.fillStyle = '#ff4444';
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.fillStyle = '#fff';
+                this.ctx.font = 'bold 8px Courier New';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText('!', pos.x, pos.y);
+            } else if (shelf.stockLevel < 100) {
+                this.ctx.fillStyle = '#555';
+                this.ctx.fillRect(pos.x - width/2, pos.y - depth/2, width, depth);
+                
+                this.ctx.strokeStyle = '#ffd700';
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeRect(pos.x - width/2, pos.y - depth/2, width, depth);
+                
+                this.ctx.fillStyle = '#ffd700';
                 this.ctx.beginPath();
                 this.ctx.arc(pos.x, pos.y, 3, 0, Math.PI * 2);
                 this.ctx.fill();
+            } else {
+                this.ctx.fillStyle = '#666';
+                this.ctx.fillRect(pos.x - width/2, pos.y - depth/2, width, depth);
+                
+                this.ctx.strokeStyle = '#888';
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeRect(pos.x - width/2, pos.y - depth/2, width, depth);
             }
         });
     }
@@ -185,20 +203,34 @@ export class Minimap {
         this.ctx.font = '10px Courier New';
         this.ctx.textAlign = 'left';
         
-        this.ctx.fillStyle = '#ff6b6b';
-        this.ctx.fillRect(5, this.height - 55, 8, 8);
+        this.ctx.fillStyle = '#ff4444';
+        this.ctx.beginPath();
+        this.ctx.arc(9, this.height - 52, 5, 0, Math.PI * 2);
+        this.ctx.fill();
         this.ctx.fillStyle = '#888';
-        this.ctx.fillText('Hot Zone', 18, this.height - 47);
+        this.ctx.fillText('Pest Zone', 20, this.height - 49);
         
-        this.ctx.fillStyle = '#00ff88';
+        this.ctx.fillStyle = '#666';
         this.ctx.fillRect(5, this.height - 42, 8, 8);
         this.ctx.fillStyle = '#888';
-        this.ctx.fillText('Normal Zone', 18, this.height - 34);
+        this.ctx.fillText('Stocked', 18, this.height - 35);
         
-        this.ctx.fillStyle = '#ff6b6b';
-        this.ctx.fillRect(5, this.height - 29, 6, 6);
+        this.ctx.fillStyle = '#ffd700';
+        this.ctx.beginPath();
+        this.ctx.arc(9, this.height - 29, 4, 0, Math.PI * 2);
+        this.ctx.fill();
         this.ctx.fillStyle = '#888';
-        this.ctx.fillText('Low Stock', 18, this.height - 22);
+        this.ctx.fillText('Low Stock', 18, this.height - 26);
+        
+        this.ctx.strokeStyle = '#ff6b6b';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(5, this.height - 19, 8, 8);
+        this.ctx.fillStyle = '#ff4444';
+        this.ctx.font = 'bold 8px Courier New';
+        this.ctx.fillText('!', 9, this.height - 15);
+        this.ctx.fillStyle = '#888';
+        this.ctx.font = '10px Courier New';
+        this.ctx.fillText('Needs Restock', 18, this.height - 12);
     }
     
     getHotZoneAlert() {

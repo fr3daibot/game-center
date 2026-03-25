@@ -8,20 +8,43 @@
 </head>
 <body>
     <div id="blocker">
-        <div id="instructions">
+        <div id="mainMenu">
             <h1>GROCERY GAUNTLET</h1>
             <p class="subtitle">Survive the Shift!</p>
-            <div class="controls-info">
-                <p><strong>WASD</strong> - Move</p>
-                <p><strong>MOUSE</strong> - Look</p>
-                <p><strong>1</strong> - Mop (Spills)</p>
-                <p><strong>2</strong> - Broom (Glass)</p>
-                <p><strong>3</strong> - Spray (Pests)</p>
-                <p><strong>E</strong> - Restock Shelves</p>
-                <p><strong>CLICK</strong> - Use Tool</p>
-            </div>
-            <button id="playButton">START SHIFT</button>
+            <button id="playButton" class="menuButton">START SHIFT</button>
+            <button id="helpButton" class="menuButton">HELP</button>
             <p class="warning">Clean up spills, sweep glass, kill pests, and restock shelves before customers arrive!</p>
+        </div>
+        
+        <div id="helpScreen" class="hidden">
+            <h1>HOW TO PLAY</h1>
+            <div class="helpSection">
+                <h2>CONTROLS</h2>
+                <p><strong>WASD</strong> - Move</p>
+                <p><strong>MOUSE</strong> - Look around</p>
+                <p><strong>CLICK</strong> - Use current tool</p>
+                <p><strong>1</strong> - Mop (clean spills)</p>
+                <p><strong>2</strong> - Broom (sweep glass)</p>
+                <p><strong>3</strong> - Spray (kill pests)</p>
+                <p><strong>E</strong> - Restock empty shelves</p>
+                <p><strong>ESC</strong> - Pause menu</p>
+                <p><strong>U</strong> - Unstock all shelves (debug)</p>
+            </div>
+            <div class="helpSection">
+                <h2>TASKS</h2>
+                <p><strong>Spills</strong> - Red puddles, use MOP to clean</p>
+                <p><strong>Glass</strong> - Shiny shards, use BROOM to sweep</p>
+                <p><strong>Pests</strong> - Rats & roaches, use SPRAY to kill</p>
+                <p><strong>Empty Shelves</strong> - Use <strong>E</strong> to restock</p>
+            </div>
+            <div class="helpSection">
+                <h2>MINIMAP</h2>
+                <p><span class="legendDot" style="background: #ff4444;"></span> <strong>Red Circles</strong> - Pest spawn zones</p>
+                <p><span class="legendDot" style="background: #666;"></span> <strong>Gray Boxes</strong> - Stocked shelves</p>
+                <p><span class="legendDot" style="background: #333; border: 1px solid #ff6b6b;"></span> <strong>Dark Box + Red Dot</strong> - Needs restock</p>
+                <p><span class="legendDot" style="background: #00ff88;"></span> <strong>Green Arrow</strong> - You</p>
+            </div>
+            <button id="backButton" class="menuButton">BACK</button>
         </div>
     </div>
 
@@ -29,19 +52,20 @@
         <h1>SHIFT OVER!</h1>
         <p id="finalScore">Score: 0</p>
         <p id="gameOverReason"></p>
-        <button id="restartButton">TRY AGAIN</button>
+        <button id="restartButton" class="menuButton">TRY AGAIN</button>
+    </div>
+
+    <div id="pauseMenu" class="hidden">
+        <h1>PAUSED</h1>
+        <button id="resumeButton" class="menuButton">RESUME</button>
+        <button id="pauseHelpButton" class="menuButton">HELP</button>
+        <button id="quitButton" class="menuButton">QUIT</button>
     </div>
 
     <div id="hud">
         <div id="hazardBar">
             <div id="hazardBarFill"></div>
             <span id="hazardLabel">HAZARD LEVEL</span>
-        </div>
-        <div id="compass">
-            <div id="compassMarker"></div>
-            <div id="compassTrack">
-                <div id="compassInner">N | NE | E</div>
-            </div>
         </div>
         <div id="timer">
             <span id="timerIcon">⏱</span>

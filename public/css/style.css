@@ -28,7 +28,7 @@ body {
     display: none;
 }
 
-#instructions {
+#mainMenu {
     text-align: center;
     padding: 40px;
     background: rgba(0, 0, 0, 0.8);
@@ -37,7 +37,7 @@ body {
     max-width: 500px;
 }
 
-#instructions h1 {
+#mainMenu h1 {
     font-size: 48px;
     color: #e94560;
     text-shadow: 0 0 20px #e94560;
@@ -52,24 +52,7 @@ body {
     font-style: italic;
 }
 
-.controls-info {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    text-align: left;
-}
-
-.controls-info p {
-    padding: 5px 0;
-    font-size: 14px;
-}
-
-.controls-info strong {
-    color: #00ff88;
-}
-
-#playButton {
+.menuButton {
     background: #e94560;
     color: white;
     border: none;
@@ -81,12 +64,24 @@ body {
     transition: all 0.3s;
     text-transform: uppercase;
     letter-spacing: 2px;
+    display: block;
+    margin: 10px auto;
+    min-width: 200px;
 }
 
-#playButton:hover {
+.menuButton:hover {
     background: #ff6b6b;
     transform: scale(1.05);
     box-shadow: 0 0 30px #e94560;
+}
+
+.menuButton.secondary {
+    background: #444;
+}
+
+.menuButton.secondary:hover {
+    background: #555;
+    box-shadow: 0 0 20px #444;
 }
 
 .warning {
@@ -94,6 +89,63 @@ body {
     font-size: 12px;
     color: #ff6b6b;
     max-width: 350px;
+}
+
+#helpScreen {
+    text-align: center;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #e94560;
+    border-radius: 10px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#helpScreen.hidden {
+    display: none;
+}
+
+#helpScreen h1 {
+    font-size: 36px;
+    color: #e94560;
+    text-shadow: 0 0 15px #e94560;
+    margin-bottom: 20px;
+    letter-spacing: 3px;
+}
+
+.helpSection {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.helpSection h2 {
+    color: #00ff88;
+    font-size: 16px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+}
+
+.helpSection p {
+    padding: 4px 0;
+    font-size: 14px;
+}
+
+.helpSection strong {
+    color: #ffd700;
+}
+
+.legendDot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
 }
 
 #gameOver {
@@ -152,6 +204,36 @@ body {
     box-shadow: 0 0 30px #00ff88;
 }
 
+#pauseMenu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1002;
+}
+
+#pauseMenu.hidden {
+    display: none;
+}
+
+#pauseMenu h1 {
+    font-size: 64px;
+    color: #ffd700;
+    text-shadow: 0 0 30px #ffd700;
+    margin-bottom: 40px;
+    letter-spacing: 6px;
+}
+
+#pauseMenu .menuButton {
+    min-width: 250px;
+}
+
 #hud {
     position: fixed;
     top: 0;
@@ -166,11 +248,11 @@ body {
 }
 
 #hazardBar {
-    width: 300px;
-    height: 20px;
-    background: rgba(0, 0, 0, 0.7);
+    width: 400px;
+    height: 35px;
+    background: rgba(0, 0, 0, 0.8);
     border: 2px solid #e94560;
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
     position: relative;
     margin-bottom: 15px;
@@ -179,9 +261,9 @@ body {
 #hazardBarFill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #00ff88, #ffd700, #ff6b6b);
+    background: linear-gradient(90deg, #ff6b6b, #ffd700, #00ff88);
     transition: width 0.3s ease;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 #hazardLabel {
@@ -189,76 +271,10 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 10px;
+    font-size: 16px;
     font-weight: bold;
     color: #fff;
-    text-shadow: 1px 1px 2px #000;
-}
-
-#compass {
-    position: absolute;
-    top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    height: 40px;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 5px;
-    border: 1px solid #444;
-}
-
-#compassTrack {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-#compassInner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 20px;
-    font-weight: bold;
-    white-space: nowrap;
-    transition: transform 0.05s linear;
-    letter-spacing: 3px;
-}
-
-#compassN {
-    color: #ff4444;
-    text-shadow: 0 0 5px #ff4444;
-}
-
-#compassS {
-    color: #888;
-}
-
-#compassE {
-    color: #888;
-}
-
-#compassW {
-    color: #888;
-}
-
-#compassMarker {
-    position: absolute;
-    top: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 10px solid #00ff88;
+    text-shadow: 2px 2px 4px #000, -1px -1px 2px #000;
 }
 
 #timer {

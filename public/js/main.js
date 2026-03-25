@@ -16,7 +16,7 @@ class Game {
         this.score = 0;
         this.combo = 1;
         this.comboTimer = 0;
-        this.gameTime = 600;
+        this.gameTime = 120;
         this.isGameOver = false;
         this.gameStarted = false;
         
@@ -95,33 +95,57 @@ class Game {
     
     setupControls() {
         this.blocker = document.getElementById('blocker');
-        this.instructions = document.getElementById('instructions');
+        this.mainMenu = document.getElementById('mainMenu');
+        this.helpScreen = document.getElementById('helpScreen');
+        this.pauseMenu = document.getElementById('pauseMenu');
         this.crosshair = document.getElementById('crosshair');
         
         this.lastMouseX = 0;
         this.lastMouseY = 0;
         this.usePointerLock = true;
         this.mouseCentered = false;
+        this.isPaused = false;
         
-        console.log('Setting up controls...');
-        
-        this.instructions.addEventListener('click', () => {
-            console.log('Play button clicked');
-            this.blocker.style.display = 'none';
+        document.getElementById('playButton').addEventListener('click', () => {
+            this.mainMenu.classList.add('hidden');
             this.startGame();
         });
         
+        document.getElementById('helpButton').addEventListener('click', () => {
+            this.mainMenu.classList.add('hidden');
+            this.helpScreen.classList.remove('hidden');
+        });
+        
+        document.getElementById('backButton').addEventListener('click', () => {
+            this.helpScreen.classList.add('hidden');
+            this.mainMenu.classList.remove('hidden');
+        });
+        
+        document.getElementById('resumeButton').addEventListener('click', () => {
+            this.resumeGame();
+        });
+        
+        document.getElementById('pauseHelpButton').addEventListener('click', () => {
+            this.pauseMenu.classList.add('hidden');
+            this.blocker.classList.remove('hidden');
+            this.helpScreen.classList.remove('hidden');
+        });
+        
+        document.getElementById('quitButton').addEventListener('click', () => {
+            this.quitToMenu();
+        });
+        
         document.addEventListener('pointerlockchange', () => {
-            console.log('Pointer lock changed:', document.pointerLockElement ? 'locked' : 'unlocked');
             if (document.pointerLockElement === document.body) {
                 this.usePointerLock = true;
-                this.isRunning = true;
-                console.log('Game running with pointer lock');
+                if (!this.isPaused) {
+                    this.isRunning = true;
+                }
             }
         });
         
         document.addEventListener('mousemove', (event) => {
-            if (!this.isRunning || !this.player) return;
+            if (!this.isRunning || !this.player || this.isPaused) return;
             
             if (this.usePointerLock && event.movementX !== undefined) {
                 this.player.rotateCamera(event.movementX, event.movementY);
@@ -144,30 +168,89 @@ class Game {
         });
         
         document.addEventListener('click', () => {
-            console.log('Click event, isRunning:', this.isRunning, 'isGameOver:', this.isGameOver);
+            if (this.isPaused) return;
             if (this.isRunning && !this.isGameOver) {
-                console.log('Using tool...');
                 this.useCurrentTool();
             }
         });
     }
     
     startGame() {
-        console.log('Starting game...');
         this.gameStarted = true;
         
-        const lockResult = document.body.requestPointerLock();
-        console.log('Pointer lock request result:', lockResult);
+        this.blocker.classList.add('hidden');
+        this.mainMenu.classList.add('hidden');
         
-        if (!lockResult) {
-            console.log('Pointer lock not granted, using fallback controls');
+        document.body.requestPointerLock();
+        
+        this.isRunning = true;
+    }
+    
+    pauseGame() {
+        this.isPaused = true;
+        this.isRunning = false;
+        this.pauseMenu.classList.remove('hidden');
+        this.helpScreen.classList.add('hidden');
+        
+        if (document.pointerLockElement) {
+            document.exitPointerLock();
+        }
+    }
+    
+    resumeGame() {
+        this.isPaused = false;
+        this.pauseMenu.classList.add('hidden');
+        this.helpScreen.classList.add('hidden');
+        
+        const lockResult = document.body.requestPointerLock();
+        if (lockResult) {
+            this.isRunning = true;
+        } else {
             this.usePointerLock = false;
             this.lastMouseX = window.screenX + window.innerWidth / 2;
             this.lastMouseY = window.screenY + window.innerHeight / 2;
+            this.isRunning = true;
+        }
+    }
+    
+    quitToMenu() {
+        this.isPaused = false;
+        this.isRunning = false;
+        this.gameStarted = false;
+        this.isGameOver = false;
+        
+        this.pauseMenu.classList.add('hidden');
+        this.helpScreen.classList.add('hidden');
+        this.mainMenu.classList.remove('hidden');
+        this.blocker.classList.remove('hidden');
+        
+        if (document.pointerLockElement) {
+            document.exitPointerLock();
         }
         
-        this.isRunning = true;
-        console.log('isRunning set to true');
+        this.resetGame();
+    }
+    
+    resetGame() {
+        this.score = 0;
+        this.combo = 1;
+        this.comboTimer = 0;
+        this.gameTime = 120;
+        this.isGameOver = false;
+        this.isRunning = false;
+        
+        if (this.ui) {
+            this.ui.updateScore(0);
+            this.ui.updateTimer('2:00');
+            this.ui.updateTasks(0);
+            this.ui.updateHazardBar(100);
+            this.ui.setTimerWarning(false);
+            this.ui.hideCombo();
+        }
+        
+        if (this.taskManager) this.taskManager.reset();
+        if (this.enemyManager) this.enemyManager.reset();
+        if (this.player) this.player.reset();
     }
     
     setupEventListeners() {
@@ -194,12 +277,34 @@ class Game {
     }
     
     onKeyDown(event) {
-        if (!this.isRunning) {
-            console.log('Key pressed but game not running, isRunning:', this.isRunning);
+        if (event.code === 'Escape') {
+            if (this.helpScreen && !this.helpScreen.classList.contains('hidden')) {
+                this.helpScreen.classList.add('hidden');
+                if (this.isPaused) {
+                    this.blocker.classList.add('hidden');
+                    this.pauseMenu.classList.remove('hidden');
+                } else {
+                    this.mainMenu.classList.remove('hidden');
+                }
+                return;
+            }
+            
+            if (this.isPaused) {
+                this.resumeGame();
+                return;
+            }
+            
+            if (this.isRunning && !this.isGameOver) {
+                this.pauseGame();
+                return;
+            }
+            
             return;
         }
         
-        console.log('Key down:', event.code);
+        if (!this.isRunning || this.isGameOver || this.isPaused) {
+            return;
+        }
         
         switch (event.code) {
             case 'KeyW':
@@ -239,6 +344,15 @@ class Game {
             case 'KeyE':
                 this.tryRestock();
                 break;
+            case 'KeyU':
+                this.tryUnstockAll();
+                break;
+        }
+    }
+    
+    tryUnstockAll() {
+        if (this.taskManager) {
+            this.taskManager.unstockAllShelves();
         }
     }
     
@@ -271,18 +385,14 @@ class Game {
     
     useCurrentTool() {
         const tool = this.player.currentWeapon;
-        console.log('useCurrentTool called, tool:', tool);
         
         this.triggerClickEffect();
         
         if (tool === 0) {
-            console.log('Using MOP to clean spills');
             this.taskManager.cleanSpills(this.player.getPosition(), this.player.getDirection());
         } else if (tool === 1) {
-            console.log('Using BROOM to clean glass');
             this.taskManager.cleanGlass(this.player.getPosition(), this.player.getDirection());
         } else if (tool === 2) {
-            console.log('Using SPRAY to kill pests');
             this.enemyManager.killPests(this.player.getPosition(), this.player.getDirection());
         }
     }
@@ -295,7 +405,6 @@ class Game {
     }
     
     tryRestock() {
-        console.log('tryRestock called');
         this.taskManager.restockShelves(this.player.getPosition(), this.player.getDirection());
     }
     
@@ -327,10 +436,7 @@ class Game {
         const seconds = Math.floor(this.gameTime % 60);
         this.ui.updateTimer(`${minutes}:${seconds.toString().padStart(2, '0')}`);
         
-        const hazardPercent = (this.gameTime / 600) * 100;
-        this.ui.updateHazardBar(hazardPercent);
-        
-        if (this.gameTime <= 60) {
+        if (this.gameTime <= 30) {
             this.ui.setTimerWarning(true);
         }
         
@@ -344,11 +450,16 @@ class Game {
         const pendingTasks = this.taskManager.getPendingCount() + this.enemyManager.getPestCount();
         this.ui.updateTasks(pendingTasks);
         
-        const taskHazard = Math.min(pendingTasks * 5, 50);
-        const totalHazard = Math.max(0, 100 - hazardPercent - taskHazard);
-        this.ui.updateHazardBar(100 - totalHazard);
+        const timePercent = (this.gameTime / 120) * 100;
+        const taskPenalty = Math.min(pendingTasks * 3, 40);
+        const hazardValue = Math.max(0, Math.min(100, timePercent - taskPenalty));
+        this.ui.updateHazardBar(hazardValue);
         
-        if (pendingTasks > 15 && Math.random() < 0.01) {
+        if (hazardValue <= 0) {
+            this.endGame('Time is up! A customer got hurt!');
+        }
+        
+        if (pendingTasks > 20 && Math.random() < 0.02) {
             this.endGame('Too many hazards! A customer slipped!');
         }
     }
@@ -368,8 +479,11 @@ class Game {
     restart() {
         this.score = 0;
         this.combo = 1;
-        this.gameTime = 600;
+        this.gameTime = 120;
         this.isGameOver = false;
+        this.isGameOver = false;
+        this.isRunning = false;
+        this.isPaused = false;
         this.gameStarted = false;
         
         this.taskManager.reset();
@@ -377,7 +491,7 @@ class Game {
         this.player.reset();
         
         this.ui.updateScore(0);
-        this.ui.updateTimer('10:00');
+        this.ui.updateTimer('2:00');
         this.ui.updateTasks(0);
         this.ui.updateHazardBar(100);
         this.ui.setTimerWarning(false);
@@ -385,7 +499,10 @@ class Game {
         
         document.getElementById('gameOver').classList.add('hidden');
         
-        this.blocker.style.display = 'flex';
+        this.blocker.classList.remove('hidden');
+        this.mainMenu.classList.remove('hidden');
+        this.pauseMenu.classList.add('hidden');
+        this.helpScreen.classList.add('hidden');
     }
     
     animate() {
@@ -396,19 +513,6 @@ class Game {
         this.prevTime = time;
         
         if (this.isRunning && !this.isGameOver) {
-            if (this.frameCount === undefined) this.frameCount = 0;
-            this.frameCount++;
-            
-            if (this.frameCount % 60 === 0) {
-                console.log('Game running', { 
-                    isRunning: this.isRunning, 
-                    isGameOver: this.isGameOver,
-                    moveForward: this.moveForward,
-                    moveBackward: this.moveBackward,
-                    playerPos: this.player ? this.player.position.clone() : 'no player'
-                });
-            }
-            
             this.player.update(delta, {
                 forward: this.moveForward,
                 backward: this.moveBackward,
@@ -419,8 +523,6 @@ class Game {
             this.taskManager.update(delta);
             this.enemyManager.update(delta);
             this.minimap.update();
-            
-            this.ui.updateCompass(this.player.euler.y);
             
             this.updateTimer(delta);
         }

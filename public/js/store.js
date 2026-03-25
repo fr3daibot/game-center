@@ -86,11 +86,6 @@ export class Store {
                 )
             });
         });
-        
-        console.log('Walls created:', this.walls.length);
-        this.walls.forEach((w, i) => {
-            console.log(`Wall ${i}: min`, w.min.x.toFixed(2), w.min.z.toFixed(2), 'max', w.max.x.toFixed(2), w.max.z.toFixed(2));
-        });
     }
     
     createAisles() {
@@ -174,6 +169,8 @@ export class Store {
             shelfGroup.add(leg);
         });
         
+        const productsByLevel = [];
+        
         for (let level = 0; level < 4; level++) {
             const shelfY = 0.5 + level * 0.6;
             
@@ -186,6 +183,7 @@ export class Store {
             shelf.receiveShadow = true;
             shelfGroup.add(shelf);
             
+            const levelProducts = [];
             for (let p = 0; p < 5; p++) {
                 const productGeom = new THREE.BoxGeometry(0.4, 0.4, 0.3);
                 const productMat = new THREE.MeshStandardMaterial({
@@ -195,11 +193,13 @@ export class Store {
                 product.position.set(
                     -width/2 + 0.4 + p * 0.55,
                     shelfY + 0.25,
-                    0
+                    0.15
                 );
                 product.castShadow = true;
                 shelfGroup.add(product);
+                levelProducts.push(product);
             }
+            productsByLevel.push(levelProducts);
         }
         
         shelfGroup.position.set(x, 0, z);
@@ -215,7 +215,8 @@ export class Store {
             collision: collisionBox,
             position: new THREE.Vector3(x, 0, z),
             stocked: true,
-            stockLevel: 100
+            stockLevel: 100,
+            productsByLevel: productsByLevel
         });
     }
     
@@ -391,7 +392,7 @@ export class Store {
             const dz = shelf.position.z - z;
             const dist = Math.sqrt(dx * dx + dz * dz);
             
-            if (dist < nearestDist && dist < 3) {
+            if (dist < nearestDist && dist < 5) {
                 nearestDist = dist;
                 nearestShelf = { shelf, index };
             }

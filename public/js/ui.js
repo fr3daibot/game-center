@@ -3,6 +3,7 @@ export class UI {
         this.game = game;
         
         this.hazardBarFill = document.getElementById('hazardBarFill');
+        this.hazardLabel = document.getElementById('hazardLabel');
         this.timerElement = document.getElementById('timer');
         this.timerValue = document.getElementById('timerValue');
         this.scoreValue = document.getElementById('scoreValue');
@@ -15,13 +16,8 @@ export class UI {
         this.notificationText = document.getElementById('notificationText');
         this.damageOverlay = document.getElementById('damageOverlay');
         
-        this.compassN = document.getElementById('compassN');
-        this.compassS = document.getElementById('compassS');
-        this.compassE = document.getElementById('compassE');
-        this.compassW = document.getElementById('compassW');
-        
-        this.maxGameTime = 600;
-        this.updateTimer('10:00');
+        this.maxGameTime = 120;
+        this.updateTimer('2:00');
         this.updateScore(0);
         this.updateTasks(0);
         this.updateHazardBar(100);
@@ -37,40 +33,17 @@ export class UI {
         
         if (percentage > 66) {
             this.hazardBarFill.style.background = 'linear-gradient(90deg, #00ff88, #66ff66)';
+            this.hazardLabel.textContent = 'TIME REMAINING';
+            this.hazardLabel.style.color = '#fff';
         } else if (percentage > 33) {
             this.hazardBarFill.style.background = 'linear-gradient(90deg, #ffd700, #ffaa00)';
+            this.hazardLabel.textContent = 'HURRY UP!';
+            this.hazardLabel.style.color = '#ffd700';
         } else {
             this.hazardBarFill.style.background = 'linear-gradient(90deg, #ff6b6b, #ff4444)';
+            this.hazardLabel.textContent = 'CRITICAL!';
+            this.hazardLabel.style.color = '#ff6b6b';
         }
-    }
-    
-    updateCompass(yaw) {
-        const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-        
-        const normalizedYaw = ((yaw % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-        const degrees = normalizedYaw * 180 / Math.PI;
-        
-        const index = Math.round(degrees / 45) % 8;
-        
-        const compassInner = document.getElementById('compassInner');
-        
-        let displayStr = '';
-        for (let i = -1; i <= 1; i++) {
-            let idx = (index + i + 8) % 8;
-            let dir = directions[idx];
-            if (i === 0) {
-                displayStr += `<span style="color: #ff4444; text-shadow: 0 0 8px #ff4444;">${dir}</span>`;
-            } else {
-                displayStr += `<span style="color: #666;">${dir}</span>`;
-            }
-            if (i < 1) displayStr += '<span style="color: #333; margin: 0 3px;">|</span>';
-        }
-        
-        compassInner.innerHTML = displayStr;
-        
-        const scrollPercent = (normalizedYaw / (Math.PI * 2)) * 100;
-        const centerOffset = 50;
-        compassInner.style.transform = `translateX(${centerOffset - scrollPercent}%)`;
     }
     
     setTimerWarning(warning) {
@@ -133,7 +106,7 @@ export class UI {
     }
     
     showMissionStart() {
-        this.showNotification('Customer arrives in 10:00!', 3000);
+        this.showNotification('Customer arrives in 2:00!', 3000);
     }
     
     showSaleAlert() {

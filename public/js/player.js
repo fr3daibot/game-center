@@ -29,21 +29,9 @@ export class Player {
         this.maxPitch = Math.PI / 2 - 0.1;
         
         this.debug = false;
-        
-        console.log('Player created at', this.position.x, this.position.y, this.position.z);
     }
     
     update(delta, input) {
-        if (this.debug && delta > 0 && (input.forward || input.backward || input.left || input.right)) {
-            console.log('Player update called', { 
-                delta, 
-                forward: input.forward, 
-                backward: input.backward,
-                left: input.left,
-                right: input.right
-            });
-        }
-        
         this.updateMovement(delta, input);
         this.updateCamera();
     }
@@ -101,8 +89,6 @@ export class Player {
         this.euler.x = Math.max(this.minPitch, Math.min(this.maxPitch, this.euler.x));
         
         this.camera.quaternion.setFromEuler(this.euler);
-        
-        if (this.debug) console.log('Camera rotated', { yaw: this.euler.y, pitch: this.euler.x });
     }
     
     jump() {
@@ -116,7 +102,6 @@ export class Player {
     selectWeapon(index) {
         if (index >= 0 && index < this.weapons.length) {
             this.currentWeapon = index;
-            console.log('Weapon selected:', this.weapons[index]);
         }
     }
     

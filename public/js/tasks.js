@@ -133,10 +133,11 @@ export class TaskManager {
         }
         
         shelf.stockLevel = Math.max(0, shelf.stockLevel - 30);
+        
+        this.updateShelfProductVisibility(shelf);
+        
         if (shelf.stockLevel <= 0) {
             shelf.stocked = false;
-            
-            this.updateShelfAppearance(shelf);
             
             this.restockTasks.push({
                 shelfIndex,
@@ -147,13 +148,73 @@ export class TaskManager {
         }
     }
     
-    updateShelfAppearance(shelf) {
-        shelf.group.children.forEach(child => {
-            if (child.material && child.material.color) {
-                const gray = 0.3 + Math.random() * 0.2;
-                child.material.color.setRGB(gray, gray, gray);
+    updateShelfProductVisibility(shelf) {
+        if (!shelf.productsByLevel) return;
+        
+        const totalProducts = shelf.productsByLevel.flat().length;
+        const visibleCount = Math.floor((shelf.stockLevel / 100) * totalProducts);
+        
+        let productIndex = 0;
+        for (let level = 0; level < shelf.productsByLevel.length; level++) {
+            const levelProducts = shelf.productsByLevel[level];
+            for (let i = 0; i < levelProducts.length; i++) {
+                const product = levelProducts[i];
+                product.visible = productIndex < visibleCount;
+                productIndex++;
+            }
+        }
+    }
+    
+    restoreShelfAppearance(shelf) {
+        if (!shelf.productsByLevel) return;
+        
+        const colors = [0x3a86ff, 0x8338ec, 0xff006e, 0xfb5607, 0xffbe0b, 0x06d6a0];
+        
+        for (let level = 0; level < shelf.productsByLevel.length; level++) {
+            const levelProducts = shelf.productsByLevel[level];
+            for (let i = 0; i < levelProducts.length; i++) {
+                const product = levelProducts[i];
+                const color = colors[(level * levelProducts.length + i) % colors.length];
+                product.material.color.setHex(color);
+                product.visible = true;
+            }
+        }
+        
+        this.updateShelfProductVisibility(shelf);
+    }
+    
+    unstockAllShelves() {
+        const totalShelves = this.store.shelves.length;
+        const shelvesToUnstock = Math.floor(totalShelves * 0.3);
+        
+        const indices = [];
+        while (indices.length < shelvesToUnstock) {
+            const idx = Math.floor(Math.random() * totalShelves);
+            if (!indices.includes(idx)) {
+                indices.push(idx);
+            }
+        }
+        
+        let count = 0;
+        indices.forEach(index => {
+            const shelf = this.store.shelves[index];
+            shelf.stockLevel = 0;
+            shelf.stocked = false;
+            this.updateShelfProductVisibility(shelf);
+            
+            const existingTask = this.restockTasks.find(t => t.shelfIndex === index);
+            if (!existingTask) {
+                this.restockTasks.push({
+                    shelfIndex: index,
+                    position: shelf.position.clone(),
+                    points: 15,
+                    completed: false
+                });
+                count++;
             }
         });
+        
+        this.showNotification(`${count} shelves need restocking!`, '#ff6b6b');
     }
     
     createEffect(position, type) {
@@ -256,7 +317,14 @@ export class TaskManager {
     restockShelves(playerPos, playerDir) {
         const shelfData = this.store.getShelfStockLevel(playerPos.x, playerPos.z);
         
-        if (shelfData && !shelfData.shelf.stocked) {
+        if (!shelfData) {
+            return;
+        }
+        
+        const stockLevel = shelfData.shelf.stockLevel;
+        const isStocked = shelfData.shelf.stocked;
+        
+        if (!isStocked) {
             shelfData.shelf.stockLevel = 100;
             shelfData.shelf.stocked = true;
             
@@ -269,21 +337,26 @@ export class TaskManager {
             
             this.game.addScore(15);
             this.game.audio.playSound('restock');
-            this.showTaskIndicator('Shelf restocked! +15');
+            this.showNotification('Shelf restocked! +15', '#00ff88');
+        } else if (stockLevel < 100) {
+            this.showNotification(`Shelf at ${stockLevel}% - keep cleaning`, '#ffd700');
+        } else {
+            this.showNotification('Shelf fully stocked', '#888');
         }
     }
     
-    restoreShelfAppearance(shelf) {
-        const colors = [0x3a86ff, 0x8338ec, 0xff006e, 0xfb5607, 0xffbe0b, 0x06d6a0];
-        let colorIndex = 0;
+    showNotification(text, color = '#ffd700') {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
         
-        shelf.group.children.forEach(child => {
-            if (child.material && child.material.color && child.geometry.type === 'BoxGeometry') {
-                if (child.geometry.parameters.width > 1) {
-                    child.material.color.setHSL(Math.random(), 0.7, 0.5);
-                }
-            }
-        });
+        notificationText.textContent = text;
+        notification.style.borderColor = color;
+        notificationText.style.color = color;
+        notification.classList.remove('hidden');
+        
+        setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 2000);
     }
     
     showTaskIndicator(text) {
