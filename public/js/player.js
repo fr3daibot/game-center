@@ -54,9 +54,9 @@ export class Player {
         this.camera.add(this.viewmodelGroup);
         this.scene.add(this.camera);
         
-        this.viewmodelGroup.position.set(0.38, -0.4, -0.35);
+        this.viewmodelGroup.position.set(0.25, -0.2, -0.35);
         this.viewmodelGroup.rotation.set(0.3, 0, -0.3);
-        this.viewmodelGroup.scale.setScalar(0.12);
+        this.viewmodelGroup.scale.setScalar(0.06);
         
         this.createMopViewmodel();
         this.createBroomViewmodel();
@@ -68,42 +68,53 @@ export class Player {
     createMopViewmodel() {
         const group = new THREE.Group();
         
-        const handleGeom = new THREE.CylinderGeometry(0.15, 0.15, 6, 8);
+        const handleGeom = new THREE.CylinderGeometry(0.04, 0.04, 3, 8);
         const handleMat = new THREE.MeshStandardMaterial({ 
             color: 0x8b4513,
-            metalness: 0.2,
-            roughness: 0.8
+            metalness: 0.3,
+            roughness: 0.6
         });
         const handle = new THREE.Mesh(handleGeom, handleMat);
-        handle.position.y = 4;
+        handle.position.y = 1.5;
         group.add(handle);
         
-        const headGeom = new THREE.BoxGeometry(2, 0.8, 2.5);
-        const headMat = new THREE.MeshStandardMaterial({ 
-            color: 0xeeeeee,
-            roughness: 0.9
+        const connectorGeom = new THREE.CylinderGeometry(0.06, 0.04, 0.3, 8);
+        const connectorMat = new THREE.MeshStandardMaterial({ 
+            color: 0x666666,
+            metalness: 0.8,
+            roughness: 0.3
         });
-        const head = new THREE.Mesh(headGeom, headMat);
-        head.position.y = -0.3;
-        group.add(head);
+        const connector = new THREE.Mesh(connectorGeom, connectorMat);
+        connector.position.y = 0;
+        group.add(connector);
         
-        for (let i = 0; i < 30; i++) {
-            const bristleGeom = new THREE.CylinderGeometry(0.05, 0.025, 1.5, 4);
-            const bristleMat = new THREE.MeshStandardMaterial({ 
-                color: 0xdddddd,
-                roughness: 1
+        const bandGeom = new THREE.CylinderGeometry(0.07, 0.07, 0.15, 8);
+        const bandMat = new THREE.MeshStandardMaterial({ 
+            color: 0x333333,
+            metalness: 0.5,
+            roughness: 0.5
+        });
+        const band = new THREE.Mesh(bandGeom, bandMat);
+        band.position.y = -0.1;
+        group.add(band);
+        
+        for (let i = 0; i < 25; i++) {
+            const strandGeom = new THREE.CylinderGeometry(0.015, 0.02, 1.2, 4);
+            const strandMat = new THREE.MeshStandardMaterial({ 
+                color: 0xcccccc,
+                roughness: 0.9
             });
-            const bristle = new THREE.Mesh(bristleGeom, bristleMat);
-            const angle = (i / 30) * Math.PI * 2;
-            const radius = 0.7 + Math.random() * 0.3;
-            bristle.position.set(
+            const strand = new THREE.Mesh(strandGeom, strandMat);
+            const angle = (i / 25) * Math.PI * 2;
+            const radius = 0.25 + Math.random() * 0.15;
+            strand.position.set(
                 Math.cos(angle) * radius,
-                -1.0,
+                -0.7,
                 Math.sin(angle) * radius
             );
-            bristle.rotation.x = (Math.random() - 0.5) * 0.5;
-            bristle.rotation.z = (Math.random() - 0.5) * 0.5;
-            group.add(bristle);
+            strand.rotation.x = (Math.random() - 0.5) * 0.3;
+            strand.rotation.z = (Math.random() - 0.5) * 0.3;
+            group.add(strand);
         }
         
         group.visible = false;
@@ -114,40 +125,55 @@ export class Player {
     createBroomViewmodel() {
         const group = new THREE.Group();
         
-        const handleGeom = new THREE.CylinderGeometry(0.1, 0.1, 6, 8);
+        const handleGeom = new THREE.CylinderGeometry(0.04, 0.04, 3, 8);
         const handleMat = new THREE.MeshStandardMaterial({ 
             color: 0x8b4513,
-            roughness: 0.8
+            metalness: 0.3,
+            roughness: 0.6
         });
         const handle = new THREE.Mesh(handleGeom, handleMat);
-        handle.position.y = 4;
+        handle.position.y = 1.5;
         group.add(handle);
         
-        const headGeom = new THREE.CylinderGeometry(1, 0.5, 1, 12);
+        const headShape = new THREE.Shape();
+        headShape.moveTo(-0.4, 0);
+        headShape.lineTo(0.4, 0);
+        headShape.lineTo(0.25, -0.3);
+        headShape.lineTo(-0.25, -0.3);
+        headShape.closePath();
+        
+        const headGeom = new THREE.ExtrudeGeometry(headShape, { depth: 0.15, bevelEnabled: false });
         const headMat = new THREE.MeshStandardMaterial({ 
             color: 0x654321,
-            roughness: 0.9
+            roughness: 0.8
         });
         const head = new THREE.Mesh(headGeom, headMat);
-        head.position.y = -0.3;
+        head.rotation.x = Math.PI / 2;
+        head.position.y = 0;
+        head.position.z = -0.075;
         group.add(head);
         
-        for (let i = 0; i < 35; i++) {
-            const bristleGeom = new THREE.CylinderGeometry(0.04, 0.02, 2, 4);
+        const bandGeom = new THREE.BoxGeometry(0.5, 0.08, 0.18);
+        const bandMat = new THREE.MeshStandardMaterial({ 
+            color: 0x333333,
+            metalness: 0.5,
+            roughness: 0.5
+        });
+        const band = new THREE.Mesh(bandGeom, bandMat);
+        band.position.y = -0.04;
+        group.add(band);
+        
+        for (let i = 0; i < 20; i++) {
+            const bristleGeom = new THREE.CylinderGeometry(0.012, 0.008, 0.8, 4);
             const bristleMat = new THREE.MeshStandardMaterial({ 
-                color: new THREE.Color().setHSL(0.12, 0.7, 0.5 + Math.random() * 0.2),
-                roughness: 1
+                color: new THREE.Color().setHSL(0.1, 0.6, 0.4 + Math.random() * 0.2),
+                roughness: 0.9
             });
             const bristle = new THREE.Mesh(bristleGeom, bristleMat);
-            const angle = (i / 35) * Math.PI * 2;
-            const radius = 0.7 + Math.random() * 0.3;
-            bristle.position.set(
-                Math.cos(angle) * radius,
-                -1.0,
-                Math.sin(angle) * radius
-            );
-            bristle.rotation.x = (Math.random() - 0.5) * 0.6;
-            bristle.rotation.z = (Math.random() - 0.5) * 0.6;
+            const x = (Math.random() - 0.5) * 0.5;
+            bristle.position.set(x, -0.45, (Math.random() - 0.5) * 0.1);
+            bristle.rotation.x = (Math.random() - 0.5) * 0.2;
+            bristle.rotation.z = x * 0.3;
             group.add(bristle);
         }
         
@@ -307,7 +333,7 @@ export class Player {
         
         let baseRotX = 0.3;
         let baseRotZ = -0.3;
-        let baseRotY = 0;
+        let baseRotY = -24.0;
         
         switch (this.viewmodelAnimState) {
             case 'switch':
@@ -354,7 +380,7 @@ export class Player {
         this.viewmodelGroup.rotation.x = baseRotX + bobX;
         this.viewmodelGroup.rotation.y = baseRotY;
         this.viewmodelGroup.rotation.z = baseRotZ + swayZ;
-        this.viewmodelGroup.position.y = -0.4 + bobY;
+        this.viewmodelGroup.position.y = -0.2 + bobY;
     }
     
     easeOut(t) {
