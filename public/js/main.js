@@ -327,6 +327,9 @@ class Game {
         const seconds = Math.floor(this.gameTime % 60);
         this.ui.updateTimer(`${minutes}:${seconds.toString().padStart(2, '0')}`);
         
+        const hazardPercent = (this.gameTime / 600) * 100;
+        this.ui.updateHazardBar(hazardPercent);
+        
         if (this.gameTime <= 60) {
             this.ui.setTimerWarning(true);
         }
@@ -341,7 +344,11 @@ class Game {
         const pendingTasks = this.taskManager.getPendingCount() + this.enemyManager.getPestCount();
         this.ui.updateTasks(pendingTasks);
         
-        if (pendingTasks > 10 && Math.random() < 0.01) {
+        const taskHazard = Math.min(pendingTasks * 5, 50);
+        const totalHazard = Math.max(0, 100 - hazardPercent - taskHazard);
+        this.ui.updateHazardBar(100 - totalHazard);
+        
+        if (pendingTasks > 15 && Math.random() < 0.01) {
             this.endGame('Too many hazards! A customer slipped!');
         }
     }
@@ -361,7 +368,7 @@ class Game {
     restart() {
         this.score = 0;
         this.combo = 1;
-        this.gameTime = 300;
+        this.gameTime = 600;
         this.isGameOver = false;
         this.gameStarted = false;
         
@@ -372,6 +379,7 @@ class Game {
         this.ui.updateScore(0);
         this.ui.updateTimer('10:00');
         this.ui.updateTasks(0);
+        this.ui.updateHazardBar(100);
         this.ui.setTimerWarning(false);
         this.ui.hideCombo();
         
@@ -411,6 +419,8 @@ class Game {
             this.taskManager.update(delta);
             this.enemyManager.update(delta);
             this.minimap.update();
+            
+            this.ui.updateCompass(this.player.euler.y);
             
             this.updateTimer(delta);
         }

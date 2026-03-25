@@ -159,9 +159,106 @@ body {
     width: 100%;
     padding: 20px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
     pointer-events: none;
     z-index: 100;
+}
+
+#hazardBar {
+    width: 300px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #e94560;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+#hazardBarFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00ff88, #ffd700, #ff6b6b);
+    transition: width 0.3s ease;
+    border-radius: 8px;
+}
+
+#hazardLabel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+}
+
+#compass {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 40px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
+    border: 1px solid #444;
+}
+
+#compassTrack {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#compassInner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: transform 0.05s linear;
+    letter-spacing: 3px;
+}
+
+#compassN {
+    color: #ff4444;
+    text-shadow: 0 0 5px #ff4444;
+}
+
+#compassS {
+    color: #888;
+}
+
+#compassE {
+    color: #888;
+}
+
+#compassW {
+    color: #888;
+}
+
+#compassMarker {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid #00ff88;
 }
 
 #timer {

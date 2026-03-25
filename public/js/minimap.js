@@ -35,12 +35,13 @@ export class Minimap {
         this.ctx.translate(centerX, centerY);
         
         const yaw = this.player.euler.y;
-        this.ctx.rotate(-yaw);
+        this.ctx.rotate(yaw);
         
         this.drawStoreOutline();
         this.drawZones();
         this.drawShelves();
         this.drawAisles();
+        this.drawCompassDirections();
         
         this.ctx.restore();
         
@@ -145,6 +146,20 @@ export class Minimap {
         }
     }
     
+    drawCompassDirections() {
+        const dist = 90;
+        this.ctx.fillStyle = '#ff4444';
+        this.ctx.font = 'bold 18px Courier New';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('N', 0, -dist);
+        
+        this.ctx.fillStyle = '#888';
+        this.ctx.fillText('S', 0, dist);
+        this.ctx.fillText('E', dist, 0);
+        this.ctx.fillText('W', -dist, 0);
+    }
+    
     drawPlayer(centerX, centerY) {
         this.ctx.save();
         this.ctx.translate(centerX, centerY);
@@ -155,9 +170,9 @@ export class Minimap {
         this.ctx.fill();
         
         this.ctx.beginPath();
-        this.ctx.moveTo(0, -15);
-        this.ctx.lineTo(-6, 6);
-        this.ctx.lineTo(6, 6);
+        this.ctx.moveTo(0, -12);
+        this.ctx.lineTo(-5, 5);
+        this.ctx.lineTo(5, 5);
         this.ctx.closePath();
         this.ctx.fillStyle = '#00ff88';
         this.ctx.fill();
