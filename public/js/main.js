@@ -460,7 +460,7 @@ class Game {
         this.ui.updateTasks(pendingTasks);
         
         const timePercent = (this.gameTime / 120) * 100;
-        const taskPenalty = Math.min(pendingTasks * 3, 40);
+        const taskPenalty = Math.min(pendingTasks, 15);
         const hazardValue = Math.max(0, Math.min(100, timePercent - taskPenalty));
         this.ui.updateHazardBar(hazardValue);
         

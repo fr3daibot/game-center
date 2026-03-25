@@ -7,14 +7,12 @@ export class Minimap {
         
         this.width = canvas.width;
         this.height = canvas.height;
+        this.radius = Math.min(this.width, this.height) / 2 - 5;
         
         this.storeWidth = 60;
         this.storeDepth = 40;
         
-        this.scale = Math.min(
-            this.width / this.storeWidth,
-            this.height / this.storeDepth
-        ) * 0.7;
+        this.scale = (this.radius * 2.0) / Math.max(this.storeWidth, this.storeDepth);
         
         this.pulseTime = 0;
     }
@@ -25,11 +23,16 @@ export class Minimap {
     }
     
     render() {
-        this.ctx.fillStyle = '#1a1a2e';
-        this.ctx.fillRect(0, 0, this.width, this.height);
-        
         const centerX = this.width / 2;
         const centerY = this.height / 2;
+        
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        
+        this.ctx.save();
+        
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
+        this.ctx.clip();
         
         this.ctx.save();
         this.ctx.translate(centerX, centerY);
@@ -46,7 +49,19 @@ export class Minimap {
         this.ctx.restore();
         
         this.drawPlayer(centerX, centerY);
+        
+        this.ctx.restore();
+        
+        this.drawBorder(centerX, centerY);
         this.drawLegend();
+    }
+    
+    drawBorder(centerX, centerY) {
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = 3;
+        this.ctx.stroke();
     }
     
     worldToMinimapLocal(x, z, playerX, playerZ) {
@@ -59,8 +74,8 @@ export class Minimap {
     drawStoreOutline() {
         const playerPos = this.player.getPosition();
         
-        this.ctx.strokeStyle = '#444';
-        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = '#fff';
+        this.ctx.lineWidth = 3;
         
         const corners = [
             { x: -this.storeWidth/2, z: -this.storeDepth/2 },
@@ -88,15 +103,15 @@ export class Minimap {
             const pos = this.worldToMinimapLocal(zone.x, zone.z, playerPos.x, playerPos.z);
             const radius = zone.radius * this.scale;
             
-            const alpha = Math.sin(this.pulseTime) * 0.1 + 0.2;
-            this.ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
+            const alpha = Math.sin(this.pulseTime) * 0.2 + 0.6;
+            this.ctx.fillStyle = `rgba(255, 100, 100, ${alpha})`;
             
             this.ctx.beginPath();
             this.ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
             this.ctx.fill();
             
-            this.ctx.strokeStyle = `rgba(255, 0, 0, ${alpha + 0.3})`;
-            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = `rgba(255, 50, 50, ${alpha})`;
+            this.ctx.lineWidth = 2;
             this.ctx.stroke();
         });
     }
@@ -111,10 +126,10 @@ export class Minimap {
             const depth = 1.2 * this.scale;
             
             if (!shelf.stocked) {
-                this.ctx.fillStyle = '#333';
+                this.ctx.fillStyle = 'rgba(200, 200, 200, 0.8)';
                 this.ctx.fillRect(pos.x - width/2, pos.y - depth/2, width, depth);
                 
-                this.ctx.strokeStyle = '#ff6b6b';
+                this.ctx.strokeStyle = '#ff4444';
                 this.ctx.lineWidth = 2;
                 this.ctx.strokeRect(pos.x - width/2, pos.y - depth/2, width, depth);
                 
@@ -129,7 +144,7 @@ export class Minimap {
                 this.ctx.textBaseline = 'middle';
                 this.ctx.fillText('!', pos.x, pos.y);
             } else if (shelf.stockLevel < 100) {
-                this.ctx.fillStyle = '#555';
+                this.ctx.fillStyle = 'rgba(150, 150, 150, 0.8)';
                 this.ctx.fillRect(pos.x - width/2, pos.y - depth/2, width, depth);
                 
                 this.ctx.strokeStyle = '#ffd700';
@@ -141,10 +156,10 @@ export class Minimap {
                 this.ctx.arc(pos.x, pos.y, 3, 0, Math.PI * 2);
                 this.ctx.fill();
             } else {
-                this.ctx.fillStyle = '#666';
+                this.ctx.fillStyle = 'rgba(100, 100, 100, 0.6)';
                 this.ctx.fillRect(pos.x - width/2, pos.y - depth/2, width, depth);
                 
-                this.ctx.strokeStyle = '#888';
+                this.ctx.strokeStyle = '#aaa';
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeRect(pos.x - width/2, pos.y - depth/2, width, depth);
             }
@@ -154,7 +169,7 @@ export class Minimap {
     drawAisles() {
         const playerPos = this.player.getPosition();
         
-        this.ctx.fillStyle = '#2a2a4a';
+        this.ctx.fillStyle = 'rgba(60, 60, 80, 0.5)';
         
         for (let i = 0; i < 5; i++) {
             const x = -20 + i * 10;
@@ -165,14 +180,14 @@ export class Minimap {
     }
     
     drawCompassDirections() {
-        const dist = 90;
-        this.ctx.fillStyle = '#ff4444';
-        this.ctx.font = 'bold 18px Courier New';
+        const dist = this.radius * 0.85;
+        this.ctx.fillStyle = '#ff6666';
+        this.ctx.font = `bold ${Math.max(12, this.radius * 0.15)}px Courier New`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText('N', 0, -dist);
         
-        this.ctx.fillStyle = '#888';
+        this.ctx.fillStyle = '#ccc';
         this.ctx.fillText('S', 0, dist);
         this.ctx.fillText('E', dist, 0);
         this.ctx.fillText('W', -dist, 0);
@@ -199,38 +214,50 @@ export class Minimap {
     }
     
     drawLegend() {
+        const legendX = this.width / 2 + this.radius + 15;
+        const legendY = this.height - 60;
+        const lineHeight = 18;
+        
         this.ctx.fillStyle = '#888';
         this.ctx.font = '10px Courier New';
         this.ctx.textAlign = 'left';
         
+        let y = legendY;
+        
         this.ctx.fillStyle = '#ff4444';
         this.ctx.beginPath();
-        this.ctx.arc(9, this.height - 52, 5, 0, Math.PI * 2);
+        this.ctx.arc(legendX, y, 5, 0, Math.PI * 2);
         this.ctx.fill();
         this.ctx.fillStyle = '#888';
-        this.ctx.fillText('Pest Zone', 20, this.height - 49);
+        this.ctx.fillText('Pest Zone', legendX + 12, y + 4);
+        
+        y += lineHeight;
         
         this.ctx.fillStyle = '#666';
-        this.ctx.fillRect(5, this.height - 42, 8, 8);
+        this.ctx.fillRect(legendX - 4, y - 4, 8, 8);
         this.ctx.fillStyle = '#888';
-        this.ctx.fillText('Stocked', 18, this.height - 35);
+        this.ctx.fillText('Stocked', legendX + 12, y + 4);
+        
+        y += lineHeight;
         
         this.ctx.fillStyle = '#ffd700';
         this.ctx.beginPath();
-        this.ctx.arc(9, this.height - 29, 4, 0, Math.PI * 2);
+        this.ctx.arc(legendX, y, 4, 0, Math.PI * 2);
         this.ctx.fill();
         this.ctx.fillStyle = '#888';
-        this.ctx.fillText('Low Stock', 18, this.height - 26);
+        this.ctx.fillText('Low Stock', legendX + 12, y + 4);
+        
+        y += lineHeight;
         
         this.ctx.strokeStyle = '#ff6b6b';
         this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(5, this.height - 19, 8, 8);
+        this.ctx.strokeRect(legendX - 4, y - 4, 8, 8);
         this.ctx.fillStyle = '#ff4444';
         this.ctx.font = 'bold 8px Courier New';
-        this.ctx.fillText('!', 9, this.height - 15);
+        this.ctx.fillText('!', legendX, y + 4);
         this.ctx.fillStyle = '#888';
         this.ctx.font = '10px Courier New';
-        this.ctx.fillText('Needs Restock', 18, this.height - 12);
+        this.ctx.fillText('Needs Restock', legendX + 12, y + 4);
     }
     
     getHotZoneAlert() {

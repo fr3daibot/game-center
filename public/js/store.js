@@ -211,14 +211,36 @@ export class Store {
             max: new THREE.Vector3(x + 1.6, height, z + 0.6)
         };
         
+        const initialStock = 50 + Math.floor(Math.random() * 51);
+        const isStocked = initialStock > 10;
+        
         this.shelves.push({
             group: shelfGroup,
             collision: collisionBox,
             position: new THREE.Vector3(x, 0, z),
-            stocked: true,
-            stockLevel: 100,
+            stocked: isStocked,
+            stockLevel: initialStock,
             productsByLevel: productsByLevel
         });
+        
+        this.updateShelfVisibility(this.shelves[this.shelves.length - 1]);
+    }
+    
+    updateShelfVisibility(shelf) {
+        if (!shelf.productsByLevel) return;
+        
+        const totalProducts = shelf.productsByLevel.flat().length;
+        const visibleCount = Math.floor((shelf.stockLevel / 100) * totalProducts);
+        
+        let productIndex = 0;
+        for (let level = 0; level < shelf.productsByLevel.length; level++) {
+            const levelProducts = shelf.productsByLevel[level];
+            for (let i = 0; i < levelProducts.length; i++) {
+                const product = levelProducts[i];
+                product.visible = productIndex < visibleCount;
+                productIndex++;
+            }
+        }
     }
     
     createCheckout() {
