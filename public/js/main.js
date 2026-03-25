@@ -65,18 +65,18 @@ class Game {
     
     setupScene() {
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x87ceeb);
-        this.scene.fog = new THREE.Fog(0x87ceeb, 0, 100);
+        this.scene.background = new THREE.Color(0x3a3a3a);
+        this.scene.fog = new THREE.Fog(0x3a3a3a, 20, 80);
         
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.set(0, 1.7, 15);
     }
     
     setupLighting() {
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         this.scene.add(ambientLight);
         
-        const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        const sunLight = new THREE.DirectionalLight(0xffffff, 0.75);
         sunLight.position.set(50, 100, 50);
         sunLight.castShadow = true;
         sunLight.shadow.mapSize.width = 2048;
@@ -266,7 +266,7 @@ class Game {
     
     setupModules() {
         this.store = new Store(this.scene);
-        this.player = new Player(this.camera, this.store);
+        this.player = new Player(this.camera, this.scene, this.store);
         this.taskManager = new TaskManager(this.scene, this.store, this);
         this.enemyManager = new EnemyManager(this.scene, this.store, this);
         this.minimap = new Minimap(document.getElementById('minimapCanvas'), this.store, this.player);
@@ -398,11 +398,15 @@ class Game {
         this.triggerClickEffect();
         
         if (tool === 0) {
+            this.player.triggerSwing();
             this.taskManager.cleanSpills(this.player.getPosition(), this.player.getDirection());
         } else if (tool === 1) {
+            this.player.triggerSwing();
             this.taskManager.cleanGlass(this.player.getPosition(), this.player.getDirection());
         } else if (tool === 2) {
-            this.enemyManager.killPests(this.player.getPosition(), this.player.getDirection());
+            this.player.triggerSpray();
+            const targetPos = this.player.getSprayTarget();
+            this.enemyManager.killPests(this.player.getPosition(), this.player.getDirection(), targetPos);
         }
     }
     

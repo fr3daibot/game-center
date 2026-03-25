@@ -47,29 +47,73 @@ export class EnemyManager {
                 this.scene.remove(effect.mesh);
                 return false;
             }
-            effect.mesh.scale.setScalar(1 + (1 - effect.life / effect.maxLife) * 3);
-            effect.mesh.material.opacity = effect.life / effect.maxLife;
+            
+            if (effect.type === 'spray') {
+                effect.mesh.position.x += effect.velocity.x * delta;
+                effect.mesh.position.y += effect.velocity.y * delta;
+                effect.mesh.position.z += effect.velocity.z * delta;
+                effect.velocity.y -= effect.gravity * delta;
+                
+                if (effect.mesh.position.y < 0.05) {
+                    effect.mesh.position.y = 0.05;
+                    effect.velocity.y = 0;
+                    effect.velocity.x *= 0.8;
+                    effect.velocity.z *= 0.8;
+                }
+                
+                effect.mesh.material.opacity = Math.min(1, effect.life / 0.2);
+            } else {
+                effect.mesh.scale.setScalar(1 + (1 - effect.life / effect.maxLife) * 3);
+                effect.mesh.material.opacity = effect.life / effect.maxLife;
+            }
             return true;
         });
     }
     
-    createSprayEffect(position) {
-        const geometry = new THREE.SphereGeometry(0.3, 8, 6);
-        const material = new THREE.MeshBasicMaterial({
-            color: 0xff4444,
-            transparent: true,
-            opacity: 1
-        });
+    createSprayEffect(position, direction, targetPos) {
+        const dropletCount = 15;
         
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(position.x, 0.5, position.z);
-        this.scene.add(mesh);
+        const sprayDir = new THREE.Vector3().subVectors(targetPos, position).normalize();
+        const nozzlePos = position.clone().add(direction.clone().multiplyScalar(0.5));
+        nozzlePos.y = 1.0;
         
-        this.effects.push({
-            mesh,
-            life: 0.4,
-            maxLife: 0.4
-        });
+        for (let i = 0; i < dropletCount; i++) {
+            const size = 0.04 + Math.random() * 0.06;
+            const dropletGeom = new THREE.SphereGeometry(size, 5, 4);
+            const dropletMat = new THREE.MeshBasicMaterial({
+                color: Math.random() > 0.5 ? 0xff6600 : 0xff4444,
+                transparent: true,
+                opacity: 1
+            });
+            const droplet = new THREE.Mesh(dropletGeom, dropletMat);
+            
+            droplet.position.copy(nozzlePos);
+            
+            this.scene.add(droplet);
+            
+            const spreadAngle = (Math.random() - 0.5) * 0.5;
+            const spreadDir = sprayDir.clone();
+            spreadDir.x += Math.sin(spreadAngle) * 0.3;
+            spreadDir.z += Math.cos(spreadAngle) * 0.3;
+            spreadDir.y += (Math.random() - 0.5) * 0.2;
+            spreadDir.normalize();
+            
+            const speed = 6 + Math.random() * 4;
+            
+            this.effects.push({
+                mesh: droplet,
+                life: 0.3 + Math.random() * 0.2,
+                maxLife: 0.4,
+                velocity: {
+                    x: spreadDir.x * speed,
+                    y: spreadDir.y * speed,
+                    z: spreadDir.z * speed
+                },
+                targetPos: targetPos.clone(),
+                gravity: 2,
+                type: 'spray'
+            });
+        }
     }
     
     spawnPest() {
@@ -232,7 +276,7 @@ export class EnemyManager {
         }
     }
     
-    killPests(playerPos, playerDir) {
+    killPests(playerPos, playerDir, targetPos) {
         let kills = 0;
         
         this.pests.forEach(pest => {
@@ -244,7 +288,7 @@ export class EnemyManager {
                 const dot = playerDir.dot(toPest);
                 
                 if (dot > 0.3 || dist < 3) {
-                    this.createSprayEffect(pest.position);
+                    this.createSprayEffect(pest.position, playerDir, targetPos);
                     pest.dead = true;
                     pest.mesh.material = new THREE.MeshStandardMaterial({ 
                         color: 0xff0000,
@@ -263,7 +307,7 @@ export class EnemyManager {
             this.showKillIndicator(kills);
         } else {
             const effectPos = playerPos.clone().add(playerDir.clone().multiplyScalar(2));
-            this.createSprayEffect(effectPos);
+            this.createSprayEffect(effectPos, playerDir, targetPos);
         }
     }
     

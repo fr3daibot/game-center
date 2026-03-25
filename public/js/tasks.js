@@ -52,16 +52,7 @@ export class TaskManager {
             }
         });
         
-        this.effects = this.effects.filter(effect => {
-            effect.life -= delta;
-            if (effect.life <= 0) {
-                this.scene.remove(effect.mesh);
-                return false;
-            }
-            effect.mesh.scale.setScalar(1 + (1 - effect.life / effect.maxLife) * 2);
-            effect.mesh.material.opacity = effect.life / effect.maxLife;
-            return true;
-        });
+        this.updateEffects(delta);
     }
     
     spawnRandomTask() {
@@ -218,44 +209,122 @@ export class TaskManager {
         this.showNotification(`${count} shelves need restocking!`, '#ff6b6b');
     }
     
-    createEffect(position, type) {
-        let geometry, material;
-        const scale = 0.5;
-        
-        if (type === 'mop') {
-            geometry = new THREE.RingGeometry(0.1, scale, 16);
-            material = new THREE.MeshBasicMaterial({
-                color: 0x00aaff,
-                transparent: true,
-                opacity: 1,
-                side: THREE.DoubleSide
-            });
-        } else if (type === 'broom') {
-            geometry = new THREE.CircleGeometry(scale, 8);
-            material = new THREE.MeshBasicMaterial({
-                color: 0xffd700,
-                transparent: true,
-                opacity: 1,
-                side: THREE.DoubleSide
-            });
+    createEffect(position, type, direction) {
+        if (type === 'mop' || type === 'broom') {
+            this.createRippleEffect(position, type);
         } else {
-            geometry = new THREE.SphereGeometry(scale, 8, 6);
-            material = new THREE.MeshBasicMaterial({
-                color: 0xff4444,
+            this.createSprayEffect(position, direction);
+        }
+    }
+    
+    createRippleEffect(position, type) {
+        const color = type === 'mop' ? 0x00aaff : 0xffd700;
+        const duration = type === 'mop' ? 0.6 : 0.4;
+        const maxRadius = type === 'mop' ? 3 : 2.5;
+        
+        for (let i = 0; i < 3; i++) {
+            const ringGeom = new THREE.RingGeometry(0.1, 0.3, 32);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.8 - i * 0.2,
+                side: THREE.DoubleSide
+            });
+            const ring = new THREE.Mesh(ringGeom, ringMat);
+            ring.position.set(position.x, 0.05, position.z);
+            ring.rotation.x = -Math.PI / 2;
+            this.scene.add(ring);
+            
+            this.effects.push({
+                mesh: ring,
+                type: 'ripple',
+                life: duration - i * 0.1,
+                maxLife: duration - i * 0.1,
+                startRadius: 0.1,
+                maxRadius: maxRadius,
+                delay: i * 0.08
+            });
+        }
+    }
+    
+    createSprayEffect(position, direction) {
+        const dropletCount = 12;
+        
+        for (let i = 0; i < dropletCount; i++) {
+            const size = 0.05 + Math.random() * 0.08;
+            const dropletGeom = new THREE.SphereGeometry(size, 6, 4);
+            const dropletMat = new THREE.MeshBasicMaterial({
+                color: 0xff6600,
                 transparent: true,
                 opacity: 1
             });
+            const droplet = new THREE.Mesh(dropletGeom, dropletMat);
+            
+            const angle = (Math.random() - 0.5) * 0.6;
+            const speed = 4 + Math.random() * 3;
+            
+            droplet.position.set(
+                position.x + direction.x * 0.5,
+                0.8 + Math.random() * 0.4,
+                position.z + direction.z * 0.5
+            );
+            
+            this.scene.add(droplet);
+            
+            this.effects.push({
+                mesh: droplet,
+                type: 'spray',
+                life: 0.4 + Math.random() * 0.2,
+                maxLife: 0.5,
+                velocity: {
+                    x: direction.x * speed + Math.sin(angle) * (Math.random() - 0.5) * 3,
+                    y: -2 + Math.random() * -2,
+                    z: direction.z * speed + Math.cos(angle) * (Math.random() - 0.5) * 3
+                },
+                gravity: 8
+            });
         }
-        
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(position.x, 0.1, position.z);
-        mesh.rotation.x = -Math.PI / 2;
-        this.scene.add(mesh);
-        
-        this.effects.push({
-            mesh,
-            life: 0.5,
-            maxLife: 0.5
+    }
+    
+    updateEffects(delta) {
+        this.effects = this.effects.filter(effect => {
+            effect.life -= delta;
+            
+            if (effect.life <= 0) {
+                this.scene.remove(effect.mesh);
+                return false;
+            }
+            
+            if (effect.type === 'ripple') {
+                if (effect.delay > 0) {
+                    effect.delay -= delta;
+                    return true;
+                }
+                
+                const progress = 1 - (effect.life / effect.maxLife);
+                const currentRadius = effect.startRadius + (effect.maxRadius - effect.startRadius) * progress;
+                effect.mesh.scale.setScalar(currentRadius / effect.startRadius);
+                effect.mesh.material.opacity = (effect.life / effect.maxLife) * 0.8;
+            } else if (effect.type === 'spray') {
+                effect.mesh.position.x += effect.velocity.x * delta;
+                effect.mesh.position.y += effect.velocity.y * delta;
+                effect.mesh.position.z += effect.velocity.z * delta;
+                effect.velocity.y -= effect.gravity * delta;
+                
+                if (effect.mesh.position.y < 0.05) {
+                    effect.mesh.position.y = 0.05;
+                    effect.velocity.y = 0;
+                    effect.velocity.x *= 0.8;
+                    effect.velocity.z *= 0.8;
+                }
+                
+                effect.mesh.material.opacity = Math.min(1, effect.life / 0.2);
+            } else {
+                effect.mesh.scale.setScalar(1 + (1 - effect.life / effect.maxLife) * 2);
+                effect.mesh.material.opacity = effect.life / effect.maxLife;
+            }
+            
+            return true;
         });
     }
     

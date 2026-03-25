@@ -15,6 +15,7 @@ export class Store {
     createStore() {
         this.createFloor();
         this.createWalls();
+        this.createOverheadLights();
         this.createAisles();
         this.createShelves();
         this.createCheckout();
@@ -22,10 +23,40 @@ export class Store {
         this.createZones();
     }
     
+    createOverheadLights() {
+        const lightPositions = [
+            { x: -15, z: -12 },
+            { x: 0, z: -12 },
+            { x: 15, z: -12 },
+            { x: -15, z: 0 },
+            { x: 0, z: 0 },
+            { x: 15, z: 0 },
+            { x: -15, z: 12 },
+            { x: 0, z: 12 },
+            { x: 15, z: 12 }
+        ];
+        
+        lightPositions.forEach(pos => {
+            const light = new THREE.PointLight(0xffffcc, 0.7, 18);
+            light.position.set(pos.x, 4.2, pos.z);
+            this.scene.add(light);
+            
+            const fixtureGeom = new THREE.CylinderGeometry(0.25, 0.35, 0.12, 8);
+            const fixtureMat = new THREE.MeshStandardMaterial({ 
+                color: 0xffffff,
+                emissive: 0xffffcc,
+                emissiveIntensity: 0.2
+            });
+            const fixture = new THREE.Mesh(fixtureGeom, fixtureMat);
+            fixture.position.set(pos.x, 4.85, pos.z);
+            this.scene.add(fixture);
+        });
+    }
+    
     createFloor() {
         const floorGeometry = new THREE.PlaneGeometry(this.width, this.depth);
         const floorMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0x808080,
+            color: 0x444444,
             roughness: 0.8
         });
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
@@ -36,9 +67,10 @@ export class Store {
         for (let x = -this.width/2 + 5; x < this.width/2; x += 5) {
             for (let z = -this.depth/2 + 5; z < this.depth/2; z += 5) {
                 const tileGeom = new THREE.PlaneGeometry(4.8, 4.8);
+                const isLight = (Math.floor(x / 5) + Math.floor(z / 5)) % 2 === 0;
                 const tileMat = new THREE.MeshStandardMaterial({
-                    color: (Math.random() > 0.5) ? 0x707070 : 0x606060,
-                    roughness: 0.9
+                    color: isLight ? 0x888888 : 0x555555,
+                    roughness: 0.85
                 });
                 const tile = new THREE.Mesh(tileGeom, tileMat);
                 tile.rotation.x = -Math.PI / 2;
@@ -137,7 +169,7 @@ export class Store {
         });
         
         const backMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0xffffff,
+            color: 0xe8e0d5,
             roughness: 0.8
         });
         
