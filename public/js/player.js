@@ -10,6 +10,7 @@ export class Player {
         this.euler = new THREE.Euler(0, Math.PI, 0, 'YXZ');
         
         this.moveSpeed = 8;
+        this.sprintSpeed = 14;
         this.jumpForce = 8;
         this.gravity = 20;
         this.friction = 10;
@@ -56,7 +57,7 @@ export class Player {
             moveDir.addScaledVector(right, moveX);
             moveDir.normalize();
             
-            const speed = this.moveSpeed * delta;
+            const speed = (input.sprinting ? this.sprintSpeed : this.moveSpeed) * delta;
             const newX = this.position.x + moveDir.x * speed;
             const newZ = this.position.z + moveDir.z * speed;
             

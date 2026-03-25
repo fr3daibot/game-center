@@ -32,6 +32,7 @@ class Game {
         this.moveBackward = false;
         this.moveLeft = false;
         this.moveRight = false;
+        this.isSprinting = false;
         this.canJump = false;
         this.velocity = new THREE.Vector3();
         this.direction = new THREE.Vector3();
@@ -323,6 +324,10 @@ class Game {
             case 'ArrowRight':
                 this.moveRight = true;
                 break;
+            case 'ShiftLeft':
+            case 'ShiftRight':
+                this.isSprinting = true;
+                break;
             case 'Space':
                 this.player.jump();
                 break;
@@ -373,6 +378,10 @@ class Game {
             case 'KeyD':
             case 'ArrowRight':
                 this.moveRight = false;
+                break;
+            case 'ShiftLeft':
+            case 'ShiftRight':
+                this.isSprinting = false;
                 break;
         }
     }
@@ -517,7 +526,8 @@ class Game {
                 forward: this.moveForward,
                 backward: this.moveBackward,
                 left: this.moveLeft,
-                right: this.moveRight
+                right: this.moveRight,
+                sprinting: this.isSprinting
             });
             
             this.taskManager.update(delta);

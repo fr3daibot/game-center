@@ -68,6 +68,7 @@ export class Store {
             const geometry = new THREE.BoxGeometry(...wall.size);
             const mesh = new THREE.Mesh(geometry, wallMaterial);
             mesh.position.set(...wall.pos);
+            mesh.rotation.set(...wall.rot);
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             this.scene.add(mesh);
@@ -283,8 +284,8 @@ export class Store {
         const px = position.x || position.x === 0 ? position.x : 0;
         const pz = position.z || position.z === 0 ? position.z : 0;
         
-        const halfWidth = this.width / 2 - 1;
-        const halfDepth = this.depth / 2 - 1;
+        const halfWidth = this.width / 2;
+        const halfDepth = this.depth / 2;
         
         if (px - radius < -halfWidth || px + radius > halfWidth) return true;
         if (pz - radius < -halfDepth || pz + radius > halfDepth) return true;
