@@ -41,7 +41,23 @@ export class TaskManager {
         
         this.spills.forEach(spill => {
             if (spill.mesh.visible) {
-                spill.mesh.rotation.y += delta * 0.5;
+                // Subtle breathing effect - pulse scale gently
+                const breathSpeed = 3;
+                const breathAmount = 0.08;
+                const baseScale = 1;
+                const scale = baseScale + Math.sin(Date.now() * 0.001 * breathSpeed) * breathAmount;
+                spill.mesh.scale.set(scale, scale, 1);
+                
+                // Animate ripple rings
+                if (spill.rings) {
+                    const ringPhase = Date.now() * 0.002;
+                    spill.rings.forEach((ring, index) => {
+                        const offset = index * 0.5;
+                        const pulse = Math.sin(ringPhase + offset) * 0.05;
+                        ring.scale.set(1 + pulse, 1 + pulse, 1);
+                        ring.material.opacity = 0.4 - (index * 0.12) + (Math.sin(ringPhase + offset) * 0.1);
+                    });
+                }
             }
         });
         
@@ -70,20 +86,70 @@ export class TaskManager {
     spawnSpill() {
         const position = this.store.getRandomHotZonePosition();
         
-        const spillGeom = new THREE.CircleGeometry(0.8, 16);
-        const spill = new THREE.Mesh(spillGeom, this.spillMaterial.clone());
-        spill.rotation.x = -Math.PI / 2;
-        spill.position.set(position.x, 0.02, position.z);
-        spill.position.y = 0.02;
-        spill.receiveShadow = true;
+        const spillGroup = new THREE.Group();
         
-        this.scene.add(spill);
+        const spillGeom = new THREE.CircleGeometry(0.8, 24);
+        const spillMat = new THREE.MeshStandardMaterial({
+            color: 0x00aaff,
+            transparent: true,
+            opacity: 0.6,
+            roughness: 0.1
+        });
+        const spill = new THREE.Mesh(spillGeom, spillMat);
+        spill.rotation.x = -Math.PI / 2;
+        spill.position.y = 0.01;
+        spill.receiveShadow = true;
+        spillGroup.add(spill);
+        
+        const ring1Geom = new THREE.RingGeometry(0.85, 0.95, 24);
+        const ring1Mat = new THREE.MeshStandardMaterial({
+            color: 0x0088cc,
+            transparent: true,
+            opacity: 0.4,
+            roughness: 0.2,
+            side: THREE.DoubleSide
+        });
+        const ring1 = new THREE.Mesh(ring1Geom, ring1Mat);
+        ring1.rotation.x = -Math.PI / 2;
+        ring1.position.y = 0.005;
+        spillGroup.add(ring1);
+        
+        const ring2Geom = new THREE.RingGeometry(1.0, 1.15, 24);
+        const ring2Mat = new THREE.MeshStandardMaterial({
+            color: 0x006699,
+            transparent: true,
+            opacity: 0.25,
+            roughness: 0.3,
+            side: THREE.DoubleSide
+        });
+        const ring2 = new THREE.Mesh(ring2Geom, ring2Mat);
+        ring2.rotation.x = -Math.PI / 2;
+        ring2.position.y = 0.003;
+        spillGroup.add(ring2);
+        
+        const ring3Geom = new THREE.RingGeometry(1.2, 1.4, 24);
+        const ring3Mat = new THREE.MeshStandardMaterial({
+            color: 0x004466,
+            transparent: true,
+            opacity: 0.15,
+            roughness: 0.4,
+            side: THREE.DoubleSide
+        });
+        const ring3 = new THREE.Mesh(ring3Geom, ring3Mat);
+        ring3.rotation.x = -Math.PI / 2;
+        ring3.position.y = 0.001;
+        spillGroup.add(ring3);
+        
+        spillGroup.position.set(position.x, 0.02, position.z);
+        
+        this.scene.add(spillGroup);
         
         this.spills.push({
-            mesh: spill,
+            mesh: spillGroup,
             position: position.clone(),
             points: 10,
-            cleaned: false
+            cleaned: false,
+            rings: [ring1, ring2, ring3]
         });
     }
     
