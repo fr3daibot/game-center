@@ -217,18 +217,20 @@ export class Player {
         nozzle.rotation.z = Math.PI / 4;
         group.add(nozzle);
         
-        const streamGeom = new THREE.CylinderGeometry(0.04, 0.02, 0.8, 8);
+        // Create spray stream as child of nozzle so it rotates with nozzle
+        const streamGeom = new THREE.CylinderGeometry(0.03, 0.015, 0.5, 6);
         const streamMat = new THREE.MeshBasicMaterial({ 
-            color: 0x00aaff,
+            color: 0xff6600,
             transparent: true,
-            opacity: 0.8
+            opacity: 0.9
         });
         const stream = new THREE.Mesh(streamGeom, streamMat);
-        stream.position.set(0.6, 0.2, 0);
-        stream.rotation.z = Math.PI / 4;
+        // Position at nozzle tip and point forward
+        stream.position.set(0, 0.1, 0); // relative to nozzle
+        stream.rotation.x = Math.PI / 2; // point forward (-Z)
         stream.name = 'sprayStream';
         stream.visible = false;
-        group.add(stream);
+        nozzle.add(stream); // attach to nozzle so it moves with nozzle
         this.sprayStream = stream;
         
         const labelGeom = new THREE.CylinderGeometry(0.37, 0.37, 1.2, 16, 1, true, 0, Math.PI);
@@ -273,7 +275,6 @@ export class Player {
         this.currentWeapon = index;
         this.viewmodelAnimState = 'switch';
         this.viewmodelAnimTime = 0;
-        this.setSprayStreamVisible(false);
     }
     
     setSprayStreamVisible(visible) {
