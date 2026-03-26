@@ -217,20 +217,19 @@ export class Player {
         nozzle.rotation.z = Math.PI / 4;
         group.add(nozzle);
         
-        // Create spray stream as child of nozzle so it rotates with nozzle
-        const streamGeom = new THREE.CylinderGeometry(0.03, 0.015, 0.5, 6);
-        const streamMat = new THREE.MeshBasicMaterial({ 
-            color: 0xff6600,
+        // Create spray cloud at nozzle tip
+        const cloudGeom = new THREE.SphereGeometry(0.3, 12, 12);
+        const cloudMat = new THREE.MeshBasicMaterial({ 
+            color: 0xff8800,
             transparent: true,
-            opacity: 0.9
+            opacity: 0.95
         });
-        const stream = new THREE.Mesh(streamGeom, streamMat);
-        // Position at nozzle tip and point forward
-        stream.position.set(0, 0.1, 0); // relative to nozzle
-        stream.rotation.x = Math.PI / 2; // point forward (-Z)
+        const stream = new THREE.Mesh(cloudGeom, cloudMat);
+        // Position at spray nozzle tip - more visible position
+        stream.position.set(0.4, 0.6, 0);
         stream.name = 'sprayStream';
         stream.visible = false;
-        nozzle.add(stream); // attach to nozzle so it moves with nozzle
+        group.add(stream);
         this.sprayStream = stream;
         
         const labelGeom = new THREE.CylinderGeometry(0.37, 0.37, 1.2, 16, 1, true, 0, Math.PI);
