@@ -98,11 +98,11 @@ export class EnemyManager {
             spreadDir.y += (Math.random() - 0.5) * 0.2;
             spreadDir.normalize();
             
-            const speed = 6 + Math.random() * 4;
+            const speed = 3 + Math.random() * 2;
             
             this.effects.push({
                 mesh: droplet,
-                life: 0.3 + Math.random() * 0.2,
+                life: 0.15 + Math.random() * 0.1,
                 maxLife: 0.4,
                 velocity: {
                     x: spreadDir.x * speed,
@@ -283,11 +283,11 @@ export class EnemyManager {
             if (pest.dead) return;
             
             const dist = playerPos.distanceTo(pest.position);
-            if (dist <= 5) {
+            if (dist <= 3) {
                 const toPest = new THREE.Vector3().subVectors(pest.position, playerPos).normalize();
                 const dot = playerDir.dot(toPest);
                 
-                if (dot > 0.3 || dist < 3) {
+                if (dot > 0.5 || dist < 2) {
                     this.createSprayEffect(pest.position, playerDir, targetPos);
                     pest.dead = true;
                     pest.mesh.material = new THREE.MeshStandardMaterial({ 
@@ -306,7 +306,7 @@ export class EnemyManager {
             this.game.audio.playSound('kill');
             this.showKillIndicator(kills);
         } else {
-            const effectPos = playerPos.clone().add(playerDir.clone().multiplyScalar(2));
+            const effectPos = playerPos.clone().add(playerDir.clone().multiplyScalar(0.3));
             this.createSprayEffect(effectPos, playerDir, targetPos);
         }
     }

@@ -40,6 +40,7 @@ export class Player {
         
         this.viewmodelGroup = null;
         this.weaponMeshes = {};
+        this.sprayStream = null;
         this.viewmodelAnimState = 'idle';
         this.viewmodelAnimTime = 0;
         this.viewmodelBobTime = 0;
@@ -216,6 +217,20 @@ export class Player {
         nozzle.rotation.z = Math.PI / 4;
         group.add(nozzle);
         
+        const streamGeom = new THREE.CylinderGeometry(0.04, 0.02, 0.8, 8);
+        const streamMat = new THREE.MeshBasicMaterial({ 
+            color: 0x00aaff,
+            transparent: true,
+            opacity: 0.8
+        });
+        const stream = new THREE.Mesh(streamGeom, streamMat);
+        stream.position.set(0.6, 0.2, 0);
+        stream.rotation.z = Math.PI / 4;
+        stream.name = 'sprayStream';
+        stream.visible = false;
+        group.add(stream);
+        this.sprayStream = stream;
+        
         const labelGeom = new THREE.CylinderGeometry(0.37, 0.37, 1.2, 16, 1, true, 0, Math.PI);
         const canvas = document.createElement('canvas');
         canvas.width = 128;
@@ -258,6 +273,13 @@ export class Player {
         this.currentWeapon = index;
         this.viewmodelAnimState = 'switch';
         this.viewmodelAnimTime = 0;
+        this.setSprayStreamVisible(false);
+    }
+    
+    setSprayStreamVisible(visible) {
+        if (this.sprayStream) {
+            this.sprayStream.visible = visible;
+        }
     }
     
     triggerSwing() {
@@ -274,7 +296,7 @@ export class Player {
         }
     }
     
-    getSprayTarget(maxDistance = 8) {
+    getSprayTarget(maxDistance = 0.3) {
         this.raycaster.setFromCamera(new THREE.Vector2(0, 0), this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
         
@@ -365,10 +387,12 @@ export class Player {
             case 'spray':
                 if (this.viewmodelAnimTime >= 0.3) {
                     this.viewmodelAnimState = 'idle';
+                    this.setSprayStreamVisible(false);
                 } else {
                     const decay = 1 - (this.viewmodelAnimTime / 0.3);
                     baseRotZ = -0.3 + Math.sin(this.viewmodelAnimTime * 80) * 0.1 * decay;
                     baseRotX = 0.3 + Math.sin(this.viewmodelAnimTime * 40) * 0.05 * decay;
+                    this.setSprayStreamVisible(true);
                 }
                 break;
                 
