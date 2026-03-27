@@ -271,9 +271,9 @@
                     <animate attributeName="y1" values="145;150;145" dur="0.15s" repeatCount="indefinite"/>
                     <animate attributeName="y2" values="153;148;153" dur="0.15s" repeatCount="indefinite"/>
                 </line>
-                <!-- Run across screen: right-to-left, Pac-Man wrap around -->
+                <!-- Run across screen: right-to-left, wrap around seamlessly -->
                 <animateTransform attributeName="transform" type="translate"
-                                  values="220 25;-60 25" dur="2.5s" repeatCount="indefinite"/>
+                                  values="120 25;-160 25" keyTimes="0;1" dur="3s" repeatCount="indefinite"/>
             </g>
         </svg>
         `;
