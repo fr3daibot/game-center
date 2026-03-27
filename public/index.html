@@ -51,18 +51,18 @@
         }
         
         .game-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 107, 53, 0.15);
             border-radius: 16px;
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #E85D04;
         }
         
         .game-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
-            border-color: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(232, 93, 4, 0.4);
+            border-color: #FF8C42;
         }
         
         .game-thumbnail {
@@ -73,7 +73,7 @@
             justify-content: center;
             overflow: hidden;
             position: relative;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff9e9e 50%, #ffd166 100%);
+            background: #FF6B35;
         }
         
         .game-thumbnail svg {
@@ -88,11 +88,11 @@
         .game-title {
             font-size: 1.4rem;
             margin-bottom: 8px;
-            color: #00d4ff;
+            color: #FFD700;
         }
         
         .game-description {
-            color: #aaa;
+            color: #e0e0e0;
             font-size: 0.9rem;
             line-height: 1.5;
         }
@@ -100,11 +100,12 @@
         .game-status {
             display: inline-block;
             margin-top: 12px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            background: rgba(0, 255, 136, 0.2);
-            color: #00ff88;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            background: #E85D04;
+            color: #fff;
         }
         
         footer {
@@ -134,15 +135,8 @@
     <script>
         const gameIconSVG = `
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <!-- Warm orange background -->
-            <rect width="200" height="200" fill="url(#warmBg)"/>
-            <defs>
-                <linearGradient id="warmBg" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#FF8C42"/>
-                    <stop offset="50%" style="stop-color:#FF6B35"/>
-                    <stop offset="100%" style="stop-color:#E85D04"/>
-                </linearGradient>
-            </defs>
+            <!-- Solid orange background -->
+            <rect width="200" height="200" fill="#FF6B35"/>
             
             <!-- Shopping Cart - wireframe side profile, mirrored, rolling left to right -->
             <g id="cart" opacity="0.25" transform="translate(-60, 0)">
