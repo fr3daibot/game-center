@@ -144,13 +144,13 @@
                 </linearGradient>
             </defs>
             
-            <!-- Shopping Cart - wireframe side profile -->
-            <g id="cart" opacity="0.25">
-                <!-- Cart basket (trapezoid - wider at top, narrower at bottom) -->
-                <path d="M40 90 L160 90 L130 130 L70 130 Z" 
+            <!-- Shopping Cart - wireframe side profile, mirrored, rolling left to right -->
+            <g id="cart" opacity="0.25" transform="translate(-60, 0)">
+                <!-- Cart basket (trapezoid - wider at top, narrower at bottom, mirrored) -->
+                <path d="M160 90 L40 90 L70 130 L130 130 Z" 
                       stroke="#fff" stroke-width="2" fill="none"/>
-                <!-- Cart handle at front -->
-                <path d="M160 90 L175 70 L185 75" 
+                <!-- Cart handle at front (now on left) -->
+                <path d="M40 90 L25 70 L15 75" 
                       stroke="#fff" stroke-width="2.5" fill="none" 
                       stroke-linecap="round" stroke-linejoin="round"/>
                 <!-- Cart frame/bottom -->
@@ -161,6 +161,9 @@
                 <!-- Wheel hubs -->
                 <circle cx="70" cy="138" r="2" fill="#fff"/>
                 <circle cx="130" cy="138" r="2" fill="#fff"/>
+                <!-- Roll left to right, Pac-Man wrap -->
+                <animateTransform attributeName="transform" type="translate"
+                                  values="-60 0;260 0" dur="6s" repeatCount="indefinite"/>
             </g>
             
             <!-- Broom Group -->
