@@ -3,129 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grocery Gauntlet</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Game Selector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf, #ff006e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .game-thumbnail {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        
+        .game-info {
+            padding: 20px;
+        }
+        
+        .game-title {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: #00d4ff;
+        }
+        
+        .game-description {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .game-status {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            color: #555;
+            font-size: 0.85rem;
+        }
+    </style>
 </head>
 <body>
-    <div id="blocker">
-        <div id="mainMenu">
-            <h1>GROCERY GAUNTLET</h1>
-            <p class="subtitle">Survive the Shift!</p>
-            <button id="playButton" class="menuButton">START SHIFT</button>
-            <button id="helpButton" class="menuButton">HELP</button>
-            <p class="warning">Clean up spills, sweep glass, kill pests, and restock shelves before customers arrive!</p>
+    <div class="container">
+        <header>
+            <h1>Game Center</h1>
+            <p class="subtitle">Select a game to play</p>
+        </header>
+        
+        <div class="games-grid" id="gamesGrid">
+            <!-- Games will be loaded dynamically -->
         </div>
         
-        <div id="helpScreen" class="hidden">
-            <h1>HOW TO PLAY</h1>
-            <div class="helpSection">
-                <h2>CONTROLS</h2>
-                <p><strong>WASD</strong> - Move</p>
-                <p><strong>SHIFT</strong> - Sprint (run faster)</p>
-                <p><strong>MOUSE</strong> - Look around</p>
-                <p><strong>CLICK</strong> - Use current tool</p>
-                <p><strong>1</strong> - Mop (clean spills)</p>
-                <p><strong>2</strong> - Broom (sweep glass)</p>
-                <p><strong>3</strong> - Spray (kill pests)</p>
-                <p><strong>E</strong> - Restock empty shelves</p>
-                <p><strong>ESC</strong> - Pause menu</p>
-                <p><strong>U</strong> - Unstock all shelves (debug)</p>
-            </div>
-            <div class="helpSection">
-                <h2>TASKS</h2>
-                <p><strong>Spills</strong> - Red puddles, use MOP to clean</p>
-                <p><strong>Glass</strong> - Shiny shards, use BROOM to sweep</p>
-                <p><strong>Pests</strong> - Rats & roaches, use SPRAY to kill</p>
-                <p><strong>Empty Shelves</strong> - Use <strong>E</strong> to restock</p>
-            </div>
-            <div class="helpSection">
-                <h2>MINIMAP</h2>
-                <p><span class="legendDot" style="background: #ff4444;"></span> <strong>Red Circles</strong> - Pest spawn zones</p>
-                <p><span class="legendDot" style="background: #666;"></span> <strong>Gray Boxes</strong> - Stocked shelves</p>
-                <p><span class="legendDot" style="background: #333; border: 1px solid #ff6b6b;"></span> <strong>Dark Box + Red Dot</strong> - Needs restock</p>
-                <p><span class="legendDot" style="background: #00ff88;"></span> <strong>Green Arrow</strong> - You</p>
-            </div>
-            <button id="backButton" class="menuButton">BACK</button>
-        </div>
+        <footer>
+            <p>More games coming soon...</p>
+        </footer>
     </div>
-
-    <div id="gameOver" class="hidden">
-        <h1>SHIFT OVER!</h1>
-        <p id="finalScore">Score: 0</p>
-        <p id="gameOverReason"></p>
-        <button id="restartButton" class="menuButton">TRY AGAIN</button>
-    </div>
-
-    <div id="pauseMenu" class="hidden">
-        <h1>PAUSED</h1>
-        <button id="resumeButton" class="menuButton">RESUME</button>
-        <button id="pauseHelpButton" class="menuButton">HELP</button>
-        <button id="quitButton" class="menuButton">QUIT</button>
-    </div>
-
-    <div id="hud">
-        <div id="hazardBar">
-            <div id="hazardBarFill"></div>
-            <span id="hazardLabel">HAZARD LEVEL</span>
-        </div>
-        <div id="timer">
-            <span id="timerIcon">⏱</span>
-            <span id="timerValue">10:00</span>
-        </div>
-        <div id="score">
-            <span id="scoreLabel">SCORE</span>
-            <span id="scoreValue">0</span>
-        </div>
-        <div id="combo" class="hidden">
-            <span id="comboValue">x2</span>
-            <span id="comboLabel">COMBO</span>
-        </div>
-        <div id="tasksRemaining">
-            <span id="tasksLabel">TASKS</span>
-            <span id="tasksValue">0</span>
-        </div>
-        <div id="weaponsPanel">
-            <div id="weapon1" class="weapon-slot active">
-                <span class="weapon-key">1</span>
-                <span class="weapon-icon">🧹</span>
-                <span class="weapon-label">MOP</span>
-            </div>
-            <div id="weapon2" class="weapon-slot">
-                <span class="weapon-key">2</span>
-                <span class="weapon-icon">🧹</span>
-                <span class="weapon-label">BROOM</span>
-            </div>
-            <div id="weapon3" class="weapon-slot">
-                <span class="weapon-key">3</span>
-                <span class="weapon-icon">💀</span>
-                <span class="weapon-label">SPRAY</span>
-            </div>
-        </div>
-    </div>
-
-    <div id="minimap">
-        <canvas id="minimapCanvas" width="200" height="200"></canvas>
-        <div id="minimapOverlay">
-            <span id="minimapLabel">STORE MAP</span>
-        </div>
-    </div>
-
-    <div id="taskIndicator" class="hidden">
-        <span id="taskIcon">!</span>
-        <span id="taskText">Spill nearby!</span>
-    </div>
-
-    <div id="crosshair"></div>
     
-    <div id="clickEffect"></div>
-
-    <div id="damageOverlay"></div>
-
-    <div id="notification" class="hidden">
-        <span id="notificationText"></span>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <script>
+        const games = [
+            {
+                id: 'grocery-gauntlet',
+                name: 'Grocery Gauntlet',
+                description: 'Clean up the store before time runs out! First-person supermarket survival game.',
+                emoji: '🛒'
+            }
+        ];
+        
+        function renderGames() {
+            const grid = document.getElementById('gamesGrid');
+            
+            games.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.onclick = () => {
+                    window.location.href = `/games/${game.id}`;
+                };
+                
+                card.innerHTML = `
+                    <div class="game-thumbnail">${game.emoji}</div>
+                    <div class="game-info">
+                        <h2 class="game-title">${game.name}</h2>
+                        <p class="game-description">${game.description}</p>
+                        <span class="game-status">Ready to Play</span>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        renderGames();
+    </script>
 </body>
 </html>
