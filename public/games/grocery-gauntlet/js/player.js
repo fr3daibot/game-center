@@ -8,7 +8,7 @@ export class Player {
         this.velocity = new THREE.Vector3();
         this.direction = new THREE.Vector3();
         
-        this.euler = new THREE.Euler(0, Math.PI, 0, 'YXZ');
+        this.euler = new THREE.Euler(0, Math.PI / 6, 0, 'YXZ');
         
         this.moveSpeed = 8;
         this.sprintSpeed = 14;
@@ -508,7 +508,7 @@ export class Player {
     reset() {
         this.position.set(0, 1.7, 15);
         this.velocity.set(0, 0, 0);
-        this.euler.set(0, Math.PI, 0);
+        this.euler.set(0, Math.PI / 6, 0);
         this.isGrounded = true;
         this.canJump = true;
         this.currentWeapon = 0;
