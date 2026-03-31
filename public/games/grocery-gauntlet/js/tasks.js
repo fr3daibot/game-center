@@ -481,8 +481,8 @@ export class TaskManager {
             this.game.audio.playSound('restock');
             this.showNotification('Shelf restocked! +15', '#00ff88');
             
-            // Add 2% (2.4 seconds) to game timer, capped at 120s
-            this.game.gameTime = Math.min(120, this.game.gameTime + 2.4);
+            // Add 1 second to game timer, capped at 120s
+            this.game.gameTime = Math.min(120, this.game.gameTime + 1);
         } else if (stockLevel < 100) {
             this.showNotification(`Shelf at ${stockLevel}% - keep cleaning`, '#ffd700');
         } else {

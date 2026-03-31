@@ -64,13 +64,16 @@
     </div>
 
     <div id="hud">
+        <div id="timerPie">
+            <svg viewBox="0 0 100 100">
+                <circle id="timerBg" cx="50" cy="50" r="42"/>
+                <circle id="timerFill" cx="50" cy="50" r="42"/>
+            </svg>
+            <span id="timerText">2:00</span>
+        </div>
         <div id="hazardBar">
             <div id="hazardBarFill"></div>
             <span id="hazardLabel">HAZARD LEVEL</span>
-        </div>
-        <div id="timer">
-            <span id="timerIcon">⏱</span>
-            <span id="timerValue">10:00</span>
         </div>
         <div id="score">
             <span id="scoreLabel">SCORE</span>

@@ -4,8 +4,8 @@ export class UI {
         
         this.hazardBarFill = document.getElementById('hazardBarFill');
         this.hazardLabel = document.getElementById('hazardLabel');
-        this.timerElement = document.getElementById('timer');
-        this.timerValue = document.getElementById('timerValue');
+        this.timerFill = document.getElementById('timerFill');
+        this.timerText = document.getElementById('timerText');
         this.scoreValue = document.getElementById('scoreValue');
         this.tasksValue = document.getElementById('tasksValue');
         this.comboElement = document.getElementById('combo');
@@ -15,40 +15,39 @@ export class UI {
         this.damageOverlay = document.getElementById('damageOverlay');
         
         this.maxGameTime = 120;
-        this.updateTimer('2:00');
+        this.timerCircumference = 264;
         this.updateScore(0);
         this.updateTasks(0);
         this.updateHazardBar(100);
+        this.updateTimerPie(100);
         this.updateWeaponUI('MOP', '🧹', 'Spills');
     }
     
-    updateTimer(time) {
-        this.timerValue.textContent = time;
+    updateTimerPie(percentage) {
+        const offset = this.timerCircumference * (1 - percentage / 100);
+        this.timerFill.style.strokeDashoffset = offset;
     }
     
     updateHazardBar(percentage) {
         this.hazardBarFill.style.width = percentage + '%';
         
-        if (percentage > 66) {
-            this.hazardBarFill.style.background = 'linear-gradient(90deg, #00ff88, #66ff66)';
-            this.hazardLabel.textContent = 'TIME REMAINING';
-            this.hazardLabel.style.color = '#fff';
-        } else if (percentage > 33) {
-            this.hazardBarFill.style.background = 'linear-gradient(90deg, #ffd700, #ffaa00)';
-            this.hazardLabel.textContent = 'HURRY UP!';
+        this.hazardBarFill.classList.remove('warning', 'danger', 'critical');
+        
+        if (percentage >= 90) {
+            this.hazardBarFill.classList.add('critical');
+            this.hazardLabel.textContent = 'DANGER!';
+            this.hazardLabel.style.color = '#ff4444';
+        } else if (percentage >= 66) {
+            this.hazardBarFill.classList.add('danger');
+            this.hazardLabel.textContent = 'DANGER!';
+            this.hazardLabel.style.color = '#ff8800';
+        } else if (percentage >= 33) {
+            this.hazardBarFill.classList.add('warning');
+            this.hazardLabel.textContent = 'HAZARD RISING';
             this.hazardLabel.style.color = '#ffd700';
         } else {
-            this.hazardBarFill.style.background = 'linear-gradient(90deg, #ff6b6b, #ff4444)';
-            this.hazardLabel.textContent = 'CRITICAL!';
-            this.hazardLabel.style.color = '#ff6b6b';
-        }
-    }
-    
-    setTimerWarning(warning) {
-        if (warning) {
-            this.timerElement.classList.add('warning');
-        } else {
-            this.timerElement.classList.remove('warning');
+            this.hazardLabel.textContent = 'HAZARD LEVEL';
+            this.hazardLabel.style.color = '#fff';
         }
     }
     

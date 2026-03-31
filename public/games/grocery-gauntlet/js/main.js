@@ -246,10 +246,8 @@ class Game {
         
         if (this.ui) {
             this.ui.updateScore(0);
-            this.ui.updateTimer('2:00');
             this.ui.updateTasks(0);
             this.ui.updateHazardBar(100);
-            this.ui.setTimerWarning(false);
             this.ui.hideCombo();
         }
         
@@ -444,18 +442,12 @@ class Game {
         
         this.gameTime -= delta;
         
-        if (this.gameTime <= 0) {
-            this.endGame('Time is up! A customer got hurt!');
-            return;
-        }
+        const timePercent = (this.gameTime / 120) * 100;
+        this.ui.updateTimerPie(timePercent);
         
         const minutes = Math.floor(this.gameTime / 60);
         const seconds = Math.floor(this.gameTime % 60);
-        this.ui.updateTimer(`${minutes}:${seconds.toString().padStart(2, '0')}`);
-        
-        if (this.gameTime <= 30) {
-            this.ui.setTimerWarning(true);
-        }
+        this.ui.timerText.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         
         if (this.comboTimer > 0) {
             this.comboTimer -= delta;
@@ -467,16 +459,15 @@ class Game {
         const pendingTasks = this.taskManager.getPendingCount() + this.enemyManager.getPestCount();
         this.ui.updateTasks(pendingTasks);
         
-        const timePercent = (this.gameTime / 120) * 100;
-        const taskPenalty = Math.min(pendingTasks, 15);
-        const hazardValue = Math.max(0, Math.min(100, timePercent - taskPenalty));
-        this.ui.updateHazardBar(hazardValue);
+        const hazardPercent = Math.min(100, pendingTasks * 2.5);
+        this.ui.updateHazardBar(hazardPercent);
         
-        if (hazardValue <= 0) {
+        if (this.gameTime <= 0) {
             this.endGame('Time is up! A customer got hurt!');
+            return;
         }
         
-        if (pendingTasks > 20 && Math.random() < 0.02) {
+        if (pendingTasks > 45 && Math.random() < 0.02) {
             this.endGame('Too many hazards! A customer slipped!');
         }
     }
@@ -508,10 +499,8 @@ class Game {
         this.player.reset();
         
         this.ui.updateScore(0);
-        this.ui.updateTimer('2:00');
         this.ui.updateTasks(0);
         this.ui.updateHazardBar(100);
-        this.ui.setTimerWarning(false);
         this.ui.hideCombo();
         
         document.getElementById('gameOver').classList.add('hidden');
