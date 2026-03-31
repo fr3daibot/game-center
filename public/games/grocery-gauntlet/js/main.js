@@ -185,6 +185,10 @@ class Game {
         document.body.requestPointerLock();
         
         this.isRunning = true;
+        
+        this.enemyManager.spawnPest();
+        this.enemyManager.spawnPest();
+        this.enemyManager.spawnPest();
     }
     
     pauseGame() {

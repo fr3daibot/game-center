@@ -50,7 +50,6 @@ export class Minimap {
         this.ctx.rotate(yaw);
         
         this.drawStoreOutline();
-        this.drawZones();
         this.drawShelves();
         this.drawAisles();
         this.drawCompassDirections();
@@ -190,7 +189,7 @@ export class Minimap {
     
     drawCompassDirections() {
         const dist = this.radius * 0.85;
-        this.ctx.fillStyle = '#ff6666';
+        this.ctx.fillStyle = '#4488ff';
         this.ctx.font = `bold ${Math.max(12, this.radius * 0.15)}px Courier New`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';

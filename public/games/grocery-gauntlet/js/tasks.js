@@ -84,7 +84,10 @@ export class TaskManager {
     }
     
     spawnSpill() {
-        const position = this.store.getRandomHotZonePosition();
+        const bounds = this.store.getStoreBounds();
+        const x = bounds.minX + Math.random() * (bounds.maxX - bounds.minX);
+        const z = bounds.minZ + Math.random() * (bounds.maxZ - bounds.minZ);
+        const position = new THREE.Vector3(x, 0, z);
         
         const spillGroup = new THREE.Group();
         
@@ -154,7 +157,10 @@ export class TaskManager {
     }
     
     spawnGlass() {
-        const position = this.store.getRandomHotZonePosition();
+        const bounds = this.store.getStoreBounds();
+        const x = bounds.minX + Math.random() * (bounds.maxX - bounds.minX);
+        const z = bounds.minZ + Math.random() * (bounds.maxZ - bounds.minZ);
+        const position = new THREE.Vector3(x, 0, z);
         
         for (let i = 0; i < 5; i++) {
             const glassGeom = new THREE.OctahedronGeometry(0.1 + Math.random() * 0.1);
@@ -189,12 +195,12 @@ export class TaskManager {
             return;
         }
         
-        const reduction = 35 + Math.floor(Math.random() * 20);
+        const reduction = 70 + Math.floor(Math.random() * 40);
         shelf.stockLevel = Math.max(0, shelf.stockLevel - reduction);
         
         this.updateShelfProductVisibility(shelf);
         
-        if (shelf.stockLevel <= 10) {
+        if (shelf.stockLevel <= 20) {
             shelf.stocked = false;
             
             this.restockTasks.push({
@@ -474,6 +480,9 @@ export class TaskManager {
             this.game.addScore(15);
             this.game.audio.playSound('restock');
             this.showNotification('Shelf restocked! +15', '#00ff88');
+            
+            // Add 2% (2.4 seconds) to game timer, capped at 120s
+            this.game.gameTime = Math.min(120, this.game.gameTime + 2.4);
         } else if (stockLevel < 100) {
             this.showNotification(`Shelf at ${stockLevel}% - keep cleaning`, '#ffd700');
         } else {

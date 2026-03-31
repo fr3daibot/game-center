@@ -207,6 +207,7 @@ export class Store {
         for (let level = 0; level < 4; level++) {
             const shelfY = 0.5 + level * 0.6;
             
+            // Front shelf surface
             const shelf = new THREE.Mesh(
                 new THREE.BoxGeometry(width - 0.2, 0.05, depth - 0.2),
                 shelfMaterial
@@ -216,7 +217,19 @@ export class Store {
             shelf.receiveShadow = true;
             shelfGroup.add(shelf);
             
+            // Back shelf surface
+            const backShelf = new THREE.Mesh(
+                new THREE.BoxGeometry(width - 0.2, 0.05, depth - 0.2),
+                shelfMaterial
+            );
+            backShelf.position.set(0, shelfY, -depth + 0.2);
+            backShelf.castShadow = true;
+            backShelf.receiveShadow = true;
+            shelfGroup.add(backShelf);
+            
             const levelProducts = [];
+            
+            // Front side products
             for (let p = 0; p < 5; p++) {
                 const productGeom = new THREE.BoxGeometry(0.4, 0.4, 0.3);
                 const productMat = new THREE.MeshStandardMaterial({
@@ -227,6 +240,23 @@ export class Store {
                     -width/2 + 0.4 + p * 0.55,
                     shelfY + 0.25,
                     0.15
+                );
+                product.castShadow = true;
+                shelfGroup.add(product);
+                levelProducts.push(product);
+            }
+            
+            // Back side products
+            for (let p = 0; p < 5; p++) {
+                const productGeom = new THREE.BoxGeometry(0.4, 0.4, 0.3);
+                const productMat = new THREE.MeshStandardMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.7, 0.5)
+                });
+                const product = new THREE.Mesh(productGeom, productMat);
+                product.position.set(
+                    -width/2 + 0.4 + p * 0.55,
+                    shelfY + 0.25,
+                    -depth + 0.35
                 );
                 product.castShadow = true;
                 shelfGroup.add(product);
@@ -325,10 +355,10 @@ export class Store {
     createZones() {
         this.zones = [
             { name: 'produce', x: -25, z: 0, radius: 8, type: 'hot', color: 0x00ff00 },
-            { name: 'dairy', x: -15, z: 0, radius: 8, type: 'normal', color: 0x00ff00 },
+            { name: 'dairy', x: -15, z: 0, radius: 8, type: 'hot', color: 0x00ff00 },
             { name: 'meat', x: -5, z: 0, radius: 8, type: 'hot', color: 0xff0000 },
-            { name: 'frozen', x: 5, z: 0, radius: 8, type: 'normal', color: 0x00ff00 },
-            { name: 'snacks', x: 15, z: 0, radius: 8, type: 'normal', color: 0x00ff00 },
+            { name: 'frozen', x: 5, z: 0, radius: 8, type: 'hot', color: 0x00ff00 },
+            { name: 'snacks', x: 15, z: 0, radius: 8, type: 'hot', color: 0x00ff00 },
             { name: 'drinks', x: 25, z: 0, radius: 8, type: 'hot', color: 0xff0000 },
             { name: 'checkout', x: 0, z: this.depth/2 - 5, radius: 6, type: 'safe', color: 0x0000ff }
         ];

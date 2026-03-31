@@ -118,7 +118,10 @@ export class EnemyManager {
     
     spawnPest() {
         const isRat = Math.random() > 0.5;
-        const position = this.store.getRandomHotZonePosition();
+        const bounds = this.store.getStoreBounds();
+        const x = bounds.minX + Math.random() * (bounds.maxX - bounds.minX);
+        const z = bounds.minZ + Math.random() * (bounds.maxZ - bounds.minZ);
+        const position = new THREE.Vector3(x, 0, z);
         
         let mesh;
         if (isRat) {
