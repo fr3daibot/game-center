@@ -1,9 +1,11 @@
 export class Minimap {
-    constructor(canvas, store, player) {
+    constructor(canvas, store, player, taskManager, enemyManager) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.store = store;
         this.player = player;
+        this.taskManager = taskManager;
+        this.enemyManager = enemyManager;
         
         this.width = canvas.width;
         this.height = canvas.height;
@@ -52,6 +54,7 @@ export class Minimap {
         this.drawStoreOutline();
         this.drawShelves();
         this.drawAisles();
+        this.drawHazards();
         this.drawCompassDirections();
         
         this.ctx.restore();
@@ -184,6 +187,65 @@ export class Minimap {
             const pos = this.worldToMinimapLocal(x, 0, playerPos.x, playerPos.z);
             
             this.ctx.fillRect(pos.x - this.scale, pos.y - 15 * this.scale, this.scale * 2, this.scale * 30);
+        }
+    }
+    
+    drawHazards() {
+        const playerPos = this.player.getPosition();
+        const pulseAlpha = Math.sin(this.pulseTime) * 0.3 + 0.7;
+        
+        // Spills (light purple)
+        if (this.taskManager && this.taskManager.spills) {
+            this.taskManager.spills.forEach(spill => {
+                if (!spill || !spill.mesh) return;
+                const pos = this.worldToMinimapLocal(spill.mesh.position.x, spill.mesh.position.z, playerPos.x, playerPos.z);
+                this.ctx.fillStyle = '#DDA0DD';
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.strokeStyle = `rgba(255, 255, 0, ${pulseAlpha})`;
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+                this.ctx.stroke();
+            });
+        }
+        
+        // Glass/debris (medium purple)
+        if (this.taskManager && this.taskManager.glassPieces) {
+            this.taskManager.glassPieces.forEach(glass => {
+                if (!glass || !glass.position) return;
+                const pos = this.worldToMinimapLocal(glass.position.x, glass.position.z, playerPos.x, playerPos.z);
+                this.ctx.fillStyle = '#9370DB';
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.strokeStyle = `rgba(255, 255, 0, ${pulseAlpha})`;
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+                this.ctx.stroke();
+            });
+        }
+        
+        // Pests (dark purple)
+        if (this.enemyManager && this.enemyManager.pests) {
+            this.enemyManager.pests.forEach(pest => {
+                if (!pest || !pest.position) return;
+                const pos = this.worldToMinimapLocal(pest.position.x, pest.position.z, playerPos.x, playerPos.z);
+                this.ctx.fillStyle = '#4B0082';
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.strokeStyle = `rgba(255, 255, 0, ${pulseAlpha})`;
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+                this.ctx.stroke();
+            });
         }
     }
     

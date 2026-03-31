@@ -272,7 +272,13 @@ class Game {
         this.player = new Player(this.camera, this.scene, this.store);
         this.taskManager = new TaskManager(this.scene, this.store, this);
         this.enemyManager = new EnemyManager(this.scene, this.store, this);
-        this.minimap = new Minimap(document.getElementById('minimapCanvas'), this.store, this.player);
+        this.minimap = new Minimap(
+            document.getElementById('minimapCanvas'), 
+            this.store, 
+            this.player,
+            this.taskManager,
+            this.enemyManager
+        );
         this.ui = new UI(this);
     }
     
